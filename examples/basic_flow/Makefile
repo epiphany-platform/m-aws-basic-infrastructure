@@ -4,18 +4,18 @@ AWSBI_IMAGE_NAME := epiphanyplatform/awsbi:0.0.1
 
 -include $(ROOT_DIR)/vars.mk
 
-M_NAME ?= awsbi-module
+M_NAME ?= awsbi-basic-flow
 M_VMS_RSA_FILENAME ?= vms_rsa
 
 export
 
-.PHONY: all metadata setup init plan apply output all-destroy destroy-plan destroy clean
+.PHONY: all metadata setup init plan apply output all-destroy plan-destroy destroy clean
 
 warning:
 	$(error Usage: make (all/metadata/setup/init/plan/apply/output/all-destroy/destroy/destroy-plan/clean) )
 
 all: init plan apply
-all-destroy: destroy-plan destroy
+all-destroy: plan-destroy destroy
 
 clean:
 	@rm -rf $(ROOT_DIR)/shared
@@ -57,7 +57,7 @@ output: setup
 		M_AWS_ACCESS_KEY=$(AWS_ACCESS_KEY) \
 		M_AWS_SECRET_KEY=$(AWS_SECRET_KEY)
 
-destroy-plan: setup
+plan-destroy: setup
 	@docker run --rm \
 		-v $(ROOT_DIR)/shared:/shared \
 		-t $(AWSBI_IMAGE_NAME) \
