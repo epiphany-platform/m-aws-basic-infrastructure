@@ -18,6 +18,11 @@ variable "use_public_ip" {
   type        = bool
 }
 
+variable "force_nat_gateway" {
+  description = "If true, the NAT gateway will be forcefully deployed"
+  type        = bool
+}
+
 variable "rsa_pub_path" {
   type = string
 }

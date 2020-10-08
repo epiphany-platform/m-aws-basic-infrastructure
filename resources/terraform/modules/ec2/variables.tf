@@ -25,6 +25,11 @@ variable "use_public_ip" {
   type        = bool
 }
 
+variable "force_nat_gateway" {
+  description = "If true, the NAT gateway will be forcefully deployed"
+  type        = bool
+}
+
 variable "region" {
   description = "Region to launch in"
   type        = string
@@ -40,7 +45,12 @@ variable "vpc_cidr_block" {
   default     = "10.1.0.0/20"
 }
 
-variable "subnet_cidr_block" {
-  description = "The cidr block of the subnet"
+variable "subnet_private_cidr_block" {
+  description = "The cidr block of the private subnet"
   default     = "10.1.1.0/24"
+}
+
+variable "subnet_public_cidr_block" {
+  description = "The cidr block of the public subnet"
+  default     = "10.1.2.0/24"
 }
