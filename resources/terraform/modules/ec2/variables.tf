@@ -31,8 +31,8 @@ variable "region" {
 }
 
 variable "key_name" {
-  description = "ssh-key name"
-  type = string
+  description = "Key pair name"
+  type        = string
 }
 
 variable "vpc_cidr_block" {

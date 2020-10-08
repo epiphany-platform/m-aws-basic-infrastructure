@@ -1,5 +1,9 @@
+locals {
+  key_name = "kp-${var.name}"
+}
+
 resource "aws_key_pair" "ec2-user" {
-  key_name   = var.admin_username
+  key_name   = local.key_name
   public_key = file(var.rsa_pub_path)
 }
 
@@ -11,5 +15,5 @@ module "ec2" {
   use_public_ip  = var.use_public_ip
   region         = var.region
   ami            = var.ami
-  key_name       = var.admin_username
+  key_name       = local.key_name
 }

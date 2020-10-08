@@ -27,7 +27,8 @@ resource "aws_subnet" "awsbi_subnet" {
   vpc_id            = aws_vpc.awsbi_vpc.id
   cidr_block        = var.subnet_cidr_block
   availability_zone = "${var.region}a"
-  tags              = {
+
+  tags = {
     Name = "subnet-${var.name}"
     cluster_name = var.name
   }
@@ -38,7 +39,8 @@ resource "aws_vpc" "awsbi_vpc" {
   instance_tenancy      = "default"
   enable_dns_support    = "true"
   enable_dns_hostnames  = "true"
-  tags                  = {
+
+  tags = {
     Name          = "vpc-${var.name}"
     cluster_name  = var.name
   }
