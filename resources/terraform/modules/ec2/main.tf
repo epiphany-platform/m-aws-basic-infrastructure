@@ -163,6 +163,10 @@ resource "aws_instance" "awsbi" {
   associate_public_ip_address = var.use_public_ip
   key_name                    = var.key_name
 
+  root_block_device {
+    volume_size = var.root_disk_size
+  }
+
   vpc_security_group_ids = [
     aws_security_group.awsbi_security_group.id
   ]

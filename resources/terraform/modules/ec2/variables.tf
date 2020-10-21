@@ -20,6 +20,11 @@ variable "instance_count" {
   type        = number
 }
 
+variable "root_disk_size" {
+  description = "The size of the volume in gibibytes (GiB)"
+  type        = number
+}
+
 variable "use_public_ip" {
   description = "If true, the EC2 instance will have associated public IP address"
   type        = bool
