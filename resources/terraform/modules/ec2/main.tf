@@ -164,7 +164,7 @@ resource "aws_instance" "awsbi" {
   key_name                    = var.key_name
 
   root_block_device {
-    volume_size = var.root_disk_size
+    volume_size = var.root_volume_size
   }
 
   vpc_security_group_ids = [
