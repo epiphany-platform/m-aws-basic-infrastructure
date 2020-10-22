@@ -8,8 +8,8 @@ variable "instance_count" {
   type        = number
 }
 
-variable "root_disk_size" {
-  description = "The size of the volume in gibibytes (GiB)"
+variable "root_volume_size" {
+  description = "The size of the root volume in gibibytes (GiB)"
   type        = number
   default     = 64
 }
