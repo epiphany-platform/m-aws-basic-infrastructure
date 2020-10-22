@@ -8,7 +8,7 @@ module "ec2" {
 
   name              = var.name
   instance_count    = var.instance_count
-  root_disk_size    = var.root_disk_size
+  root_volume_size    = var.root_volume_size
   use_public_ip     = var.use_public_ip
   force_nat_gateway = var.force_nat_gateway
   region            = var.region
