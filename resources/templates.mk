@@ -7,6 +7,7 @@ labels:
   provider: aws
   provides-vms: true
   provides-pubips: $(M_PUBLIC_IPS)
+  os: $(M_OS)
 endef
 
 define M_CONFIG_CONTENT
@@ -18,6 +19,7 @@ $(M_MODULE_SHORT):
   use_public_ip: $(M_PUBLIC_IPS)
   force_nat_gateway: $(M_NAT_GATEWAY)
   rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
+  os: $(M_OS)
 endef
 
 define M_STATE_INITIAL

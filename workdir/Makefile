@@ -4,7 +4,7 @@ include $(M_RESOURCES)/defaults.mk
 
 export
 
-.PHONY: metadata init plan apply audit destroy plan-destroy output
+.PHONY: metadata init plan apply audit destroy plan-destroy all-destroy output
 
 #medatada method is printing static metadata information about module
 metadata: guard-M_RESOURCES
@@ -32,6 +32,8 @@ audit:
 destroy: template-tfvars terraform-destroy update-state-after-destroy
 
 plan-destroy: template-tfvars terraform-plan-destroy
+
+all-destroy: plan-destroy destroy
 
 output: terraform-output
 

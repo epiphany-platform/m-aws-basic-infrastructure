@@ -1,5 +1,23 @@
 locals {
   use_nat_gateway = var.force_nat_gateway || !var.use_public_ip
+  select_ami = var.os == "redhat" ? "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2" : "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200611"
+  select_owner = var.os == "redhat" ? "309956199498" : "099720109477"
+}
+
+data "aws_ami" "select" {
+  owners = [local.select_owner]
+  filter {
+    name   = "name"
+    values = ["${local.select_ami}"]
+  }
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 }
 
 resource "aws_resourcegroups_group" "rg" {
@@ -157,7 +175,7 @@ resource "aws_security_group" "awsbi_security_group" {
 resource "aws_instance" "awsbi" {
   count = var.instance_count
 
-  ami                         = var.ami
+  ami                         = data.aws_ami.select.id
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.awsbi_private_subnet.id
   associate_public_ip_address = var.use_public_ip

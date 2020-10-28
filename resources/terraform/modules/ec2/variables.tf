@@ -4,11 +4,6 @@ variable "name" {
   default     = "awsbi"
 }
 
-variable "ami" {
-  description = "ID of AMI to use for the instance"
-  type        = string
-}
-
 variable "instance_type" {
   description = "The type of instance to start"
   type        = string
@@ -58,4 +53,9 @@ variable "subnet_private_cidr_block" {
 variable "subnet_public_cidr_block" {
   description = "The cidr block of the public subnet"
   default     = "10.1.2.0/24"
+}
+
+variable "os" {
+  description = "Operating System to launch"
+  type = string
 }

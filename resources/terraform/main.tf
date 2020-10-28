@@ -12,6 +12,6 @@ module "ec2" {
   use_public_ip     = var.use_public_ip
   force_nat_gateway = var.force_nat_gateway
   region            = var.region
-  ami               = var.ami
   key_name          = aws_key_pair.kp.key_name
+  os                = var.os
 }
