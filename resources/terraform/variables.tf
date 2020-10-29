@@ -33,11 +33,6 @@ variable "rsa_pub_path" {
   type = string
 }
 
-variable "admin_username" {
-  type    = string
-  default = "ec2-user"
-}
-
 variable "os" {
   description = "Operating System to launch"
   type = string
