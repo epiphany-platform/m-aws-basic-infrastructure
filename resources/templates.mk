@@ -7,7 +7,6 @@ labels:
   provider: aws
   provides-vms: true
   provides-pubips: $(M_PUBLIC_IPS)
-  os: $(M_OS)
 endef
 
 define M_CONFIG_CONTENT
