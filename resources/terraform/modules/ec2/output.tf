@@ -17,3 +17,7 @@ output "private_subnet_id" {
 output "public_subnet_id" {
   value = aws_subnet.awsbi_public_subnet.id
 }
+
+output "private_route_table" {
+  value = "${ join(" ", aws_route_table.awsbi_route_table_private.*.id) }"
+}
