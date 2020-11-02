@@ -1,6 +1,4 @@
 trigger:
-  batch: true
-  branches:
   - develop
   - master
 pr:
