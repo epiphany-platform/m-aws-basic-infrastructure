@@ -6,6 +6,10 @@ AwsBI module is reponsible for providing basic cloud resources (eg. resource gro
 
 # Basic usage
 
+## Requirements
+
+Requirements are listed in a separate [document](docs/REQUIREMENTS.md).
+
 ## Build image
 
 In main directory run:
@@ -44,13 +48,7 @@ or directly using Docker:
   ```
 
   This command will create configuration file of AwsBI module in /tmp/shared/awsbi/awsbi-config.yml. You can investigate what is stored in that file.
-  Available variables:
-  * M_VMS_COUNT = < instance count > (default: 1)
-  * M_PUBLIC_IPS =  < true/false > (default: true)
-  * M_NAME = < module name > (default: epiphany)
-  * M_VMS_RSA = < ssh priv key name > (defailt: vms_rsa)
-  * M_REGION = < aws region > (default: eu-central-1)
-  * M_OS = < ubuntu/redhat > (default: ubuntu)
+  Available parameters are listed in the [inputs](docs/INPUTS.adoc) document.
 
 * Plan and apply AwsBI module:
 
@@ -125,10 +123,6 @@ The output from this module is:
 * public_subnet_id
 * vpc_id
 * private_route_table_id
-
-# Windows users
-
-This module is designed for Linux/Unix development/usage only. If you need to develop from Windows you can use the included [devcontainer setup for VScode](https://code.visualstudio.com/docs/remote/containers-tutorial) and run the examples the same way but then from then ```examples/basic_flow_devcontainer``` folder.
 
 ## Module dependencies
 
