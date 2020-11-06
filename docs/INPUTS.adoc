@@ -1,29 +1,31 @@
 == Input parameters
 
-[width="100%",cols="7%,1%,100%a,1%,50%a",options="header",]
+[width="100%",cols="7%,1%,25%a,1%,20%,50%a",options="header",]
 |===
-|Name |Type |Default value |Required |Description
-|AWS_ACCESS_KEY_ID |string |unset |yes |AWS access key id
+|Name |Type |Default value |Required |Steps |Description
+|AWS_ACCESS_KEY_ID |string |unset |yes |plan, apply, plan-destroy, destroy
+|AWS access key id
 
-|AWS_SECRET_ACCESS_KEY |string |unset |yes |AWS access key secret
+|AWS_SECRET_ACCESS_KEY |string |unset |yes |plan, apply, plan-destroy, destroy
+|AWS access key secret
 
-|M_VMS_COUNT |number |1 |no |Number of instances to launch
+|M_VMS_COUNT |number |1 |no |init |Number of instances to launch
 
-|M_PUBLIC_IPS |bool |true |no |If true, the EC2 instance
+|M_PUBLIC_IPS |bool |true |no |init |If true, the EC2 instance
 will have associated public IP address
 
-|M_NAT_GATEWAY |bool |true |no |If true, the NAT gateway
+|M_NAT_GATEWAY |bool |true |no |init |If true, the NAT gateway
 will be deployed
 
-|M_NAME |string |epiphany |no |Name to be used on all resources
+|M_NAME |string |epiphany |no |init |Name to be used on all resources
 as a prefix
 
-|M_VMS_RSA |string |vms_rsa |no |SSH key name, should be located in
+|M_VMS_RSA |string |vms_rsa |no |init |SSH key name, should be located in
 shared directory
 
-|M_REGION |string |eu-central-1 |no |AWS Region to launch
+|M_REGION |string |eu-central-1 |no |init |AWS Region to launch
 module in
 
-|M_OS |string |ubuntu |no |Operating System to launch.
+|M_OS |string |ubuntu |no |init |Operating System to launch.
 Possible values: ubuntu/redhat
 |===

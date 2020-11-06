@@ -53,11 +53,12 @@ or directly using Docker:
 * Plan and apply AwsBI module:
 
   ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:latest plan M_AWS_ACCESS_KEY=xxx M_AWS_SECRET_KEY=xxx M_NAME=xxx
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:latest apply M_AWS_ACCESS_KEY=xxx M_AWS_SECRET_KEY=xxx M_NAME=xxx
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:latest plan M_AWS_ACCESS_KEY=xxx M_AWS_SECRET_KEY=xxx
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:latest apply M_AWS_ACCESS_KEY=xxx M_AWS_SECRET_KEY=xxx
   ```
 
-  Running those commands should create a bunch of AWS resources (resource group, vpc, subnet, ec2 instances and so on). You can verify it in AWS Management Console.
+  Running those commands should create a bunch of AWS resources (resource group, vpc, subnet, ec2 instances and so on). 
+  You can verify it in AWS Management Console.
 
 ## Run module with provided example
 
