@@ -545,67 +545,86 @@ func removeSingleNatGatewayWithRetries(ec2Client *ec2.EC2, ngIDToRemove string) 
 
 	for retry := 0; retry <= retries && found; retry++ {
 
-		outDesc, errDesc := ec2Client.DescribeNatGateways(descInp)
-		if errDesc != nil {
-			log.Println(errDesc)
-			if aerr, ok := errDesc.(awserr.Error); ok {
-				if aerr.Code() == "NatGatewayNotFound" {
-					log.Println("Nat Gateway: Nat Gateway not found.")
-					found = false
-					continue
-				} else {
-					log.Fatal("Nat Gateway: Describe error: ", errDesc)
-				}
-			} else {
-				log.Fatal("Nat Gateway: Three was an error: ", errDesc.Error())
-			}
-		}
-		log.Printf("Nat Gateway: Describe output: %s", outDesc)
+		found = describeNatGateway(ec2Client, descInp)
 
-		if outDesc.NatGateways == nil || *outDesc.NatGateways[0].State == "deleted" {
-			log.Print("Nat Gateway: Element not found or has been already deleted.")
-			found = false
+		if found == false {
 			continue
 		}
 
-		ngInp := &ec2.DeleteNatGatewayInput{
+		ngDelInp := &ec2.DeleteNatGatewayInput{
 			NatGatewayId: &ngIDToRemove,
 		}
 
-		output, err := ec2Client.DeleteNatGateway(ngInp)
+		found = deleteNatGateway(ec2Client, ngDelInp)
 
-		if err != nil {
-			log.Println("Nat Gateway: Error: ", err)
-			if aerr, ok := err.(awserr.Error); ok {
-				if aerr.Code() == "NatGatewayNotFound" {
-					log.Print("Nat Gateway: Element not found.", err)
-					found = false
-					continue
-				}
-				if aerr.Code() != "ResourceNotReady" {
-					log.Fatal("Nat Gateway: Deleting NAT Gateway: ", err)
-				}
-			} else {
-				log.Fatal("Nat Gateway: Deleting NAT Gateway: ", err.Error())
-			}
-
+		if found == false {
+			continue
 		}
 
-		errWait := ec2Client.WaitUntilNatGatewayAvailable(descInp)
-		if errWait != nil {
-			if aerr, ok := errWait.(awserr.Error); ok {
-				if aerr.Code() != "ResourceNotReady" {
-					log.Fatal("Nat Gateway: Wait error: ", errDesc)
-				}
-			} else {
-				log.Fatal("Nat Gateway: Three was an error: ", errWait.Error())
-			}
-		}
+		waitForNatGatewayDelete(ec2Client, descInp)
 
-		log.Println("Nat Gateway: Deleting NAT Gateway. Retry: ", retry)
-		log.Println(output)
-
+		log.Println("Nat Gateway: Deleting NAT Gateway. ", ngIDToRemove, " Retry: ", retry)
 		time.Sleep(5 * time.Second)
+	}
+}
+
+// describe Nat Gateway based on ec2 client and describe input, returns false if Nat Gateway not found or deleted
+func describeNatGateway(ec2Client *ec2.EC2, descInp *ec2.DescribeNatGatewaysInput) bool {
+	outDesc, errDesc := ec2Client.DescribeNatGateways(descInp)
+	if errDesc != nil {
+		log.Println(errDesc)
+		if aerr, ok := errDesc.(awserr.Error); ok {
+			if aerr.Code() == "NatGatewayNotFound" {
+				log.Println("Nat Gateway: Nat Gateway not found.")
+				return false
+			} else {
+				log.Fatal("Nat Gateway: Describe error: ", errDesc)
+			}
+		} else {
+			log.Fatal("Nat Gateway: Three was an error: ", errDesc.Error())
+		}
+	}
+	log.Printf("Nat Gateway: Describe output: %s", outDesc)
+
+	if outDesc.NatGateways == nil || *outDesc.NatGateways[0].State == "deleted" {
+		log.Print("Nat Gateway: Element not found or has been already deleted.")
+		return false
+	}
+	return true
+}
+
+// appropriate Nat Gateway delete method based on ec2 client and delete input, returns false if Nat Gateway not found or deleted
+func deleteNatGateway(ec2Client *ec2.EC2, ngInp *ec2.DeleteNatGatewayInput) bool {
+	_, err := ec2Client.DeleteNatGateway(ngInp)
+
+	if err != nil {
+		log.Println("Nat Gateway: Error: ", err)
+		if aerr, ok := err.(awserr.Error); ok {
+			if aerr.Code() == "NatGatewayNotFound" {
+				log.Print("Nat Gateway: Element not found.", err)
+				return false
+			}
+			if aerr.Code() != "ResourceNotReady" {
+				log.Fatal("Nat Gateway: Deleting NAT Gateway: ", err)
+			}
+		} else {
+			log.Fatal("Nat Gateway: Deleting NAT Gateway: ", err.Error())
+		}
+
+	}
+	return true
+}
+
+func waitForNatGatewayDelete(ec2Client *ec2.EC2, descInp *ec2.DescribeNatGatewaysInput) {
+	errWait := ec2Client.WaitUntilNatGatewayAvailable(descInp)
+	if errWait != nil {
+		if aerr, ok := errWait.(awserr.Error); ok {
+			if aerr.Code() != "ResourceNotReady" {
+				log.Fatal("Nat Gateway: Wait error: ", errWait)
+			}
+		} else {
+			log.Fatal("Nat Gateway: Three was an error: ", errWait.Error())
+		}
 	}
 }
 
