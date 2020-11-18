@@ -292,7 +292,7 @@ func cleanupAWSResources() {
 				log.Fatal("Resource group: Cannot get list of resources: ", errResourcesList)
 			}
 		} else {
-			log.Fatal("Resource group: Three was an error: ", errResourcesList.Error())
+			log.Fatal("Resource group: There was an error: ", errResourcesList.Error())
 		}
 	}
 
@@ -537,39 +537,36 @@ func removeNatGateways(session *session.Session, ngsToRemove []*resourcegroups.R
 
 // remove single nat gateway based on nat gateway ID using ec2 client
 func removeSingleNatGatewayWithRetries(ec2Client *ec2.EC2, ngIDToRemove string) {
-	descInp := &ec2.DescribeNatGatewaysInput{
-		NatGatewayIds: []*string{&ngIDToRemove},
-	}
 
 	found := true
 
 	for retry := 0; retry <= retries && found; retry++ {
 
-		found = describeNatGateway(ec2Client, descInp)
+		found = describeNatGateway(ec2Client, ngIDToRemove)
 
 		if found == false {
 			continue
 		}
 
-		ngDelInp := &ec2.DeleteNatGatewayInput{
-			NatGatewayId: &ngIDToRemove,
-		}
-
-		found = deleteNatGateway(ec2Client, ngDelInp)
+		found = removeNatGateway(ec2Client, ngIDToRemove)
 
 		if found == false {
 			continue
 		}
 
-		waitForNatGatewayDelete(ec2Client, descInp)
+		waitForNatGatewayDelete(ec2Client, ngIDToRemove)
 
 		log.Println("Nat Gateway: Deleting NAT Gateway. ", ngIDToRemove, " Retry: ", retry)
 		time.Sleep(5 * time.Second)
 	}
 }
 
-// describe Nat Gateway based on ec2 client and describe input, returns false if Nat Gateway not found or deleted
-func describeNatGateway(ec2Client *ec2.EC2, descInp *ec2.DescribeNatGatewaysInput) bool {
+// describe Nat Gateway based on ec2 client and Nat Gateway id, returns false if Nat Gateway not found or deleted
+func describeNatGateway(ec2Client *ec2.EC2, ngIDToDescribe string) bool {
+	descInp := &ec2.DescribeNatGatewaysInput{
+		NatGatewayIds: []*string{&ngIDToDescribe},
+	}
+
 	outDesc, errDesc := ec2Client.DescribeNatGateways(descInp)
 	if errDesc != nil {
 		log.Println(errDesc)
@@ -581,7 +578,7 @@ func describeNatGateway(ec2Client *ec2.EC2, descInp *ec2.DescribeNatGatewaysInpu
 				log.Fatal("Nat Gateway: Describe error: ", errDesc)
 			}
 		} else {
-			log.Fatal("Nat Gateway: Three was an error: ", errDesc.Error())
+			log.Fatal("Nat Gateway: There was an error: ", errDesc.Error())
 		}
 	}
 	log.Printf("Nat Gateway: Describe output: %s", outDesc)
@@ -593,9 +590,13 @@ func describeNatGateway(ec2Client *ec2.EC2, descInp *ec2.DescribeNatGatewaysInpu
 	return true
 }
 
-// appropriate Nat Gateway delete method based on ec2 client and delete input, returns false if Nat Gateway not found or deleted
-func deleteNatGateway(ec2Client *ec2.EC2, ngInp *ec2.DeleteNatGatewayInput) bool {
-	_, err := ec2Client.DeleteNatGateway(ngInp)
+// appropriate Nat Gateway delete method based on ec2 client and Nat Gateway id, returns false if Nat Gateway not found
+func removeNatGateway(ec2Client *ec2.EC2, ngIDToRemove string) bool {
+	ngDelInp := &ec2.DeleteNatGatewayInput{
+		NatGatewayId: &ngIDToRemove,
+	}
+
+	_, err := ec2Client.DeleteNatGateway(ngDelInp)
 
 	if err != nil {
 		log.Println("Nat Gateway: Error: ", err)
@@ -615,7 +616,12 @@ func deleteNatGateway(ec2Client *ec2.EC2, ngInp *ec2.DeleteNatGatewayInput) bool
 	return true
 }
 
-func waitForNatGatewayDelete(ec2Client *ec2.EC2, descInp *ec2.DescribeNatGatewaysInput) {
+// wait for Nat Gateway to be removed based on ec2 client and Nat Gateway id
+func waitForNatGatewayDelete(ec2Client *ec2.EC2, ngIDToWait string) {
+	descInp := &ec2.DescribeNatGatewaysInput{
+		NatGatewayIds: []*string{&ngIDToWait},
+	}
+
 	errWait := ec2Client.WaitUntilNatGatewayAvailable(descInp)
 	if errWait != nil {
 		if aerr, ok := errWait.(awserr.Error); ok {
@@ -623,7 +629,7 @@ func waitForNatGatewayDelete(ec2Client *ec2.EC2, descInp *ec2.DescribeNatGateway
 				log.Fatal("Nat Gateway: Wait error: ", errWait)
 			}
 		} else {
-			log.Fatal("Nat Gateway: Three was an error: ", errWait.Error())
+			log.Fatal("Nat Gateway: There was an error: ", errWait.Error())
 		}
 	}
 }
@@ -724,7 +730,7 @@ func releaseAddresses(session *session.Session, eipName string) {
 								log.Fatal("EIP: Releasing EIP error: ", err)
 							}
 						} else {
-							log.Fatal("EIP: Three was an error: ", err.Error())
+							log.Fatal("EIP: There was an error: ", err.Error())
 						}
 					}
 					log.Println("EIP: Releasing EIP. Retry: ", retry)
@@ -755,7 +761,7 @@ func removeResourceGroup(session *session.Session, rgToRemoveName string) {
 				log.Fatal("Resource Group: Deleting resource group error: ", rgDelErr)
 			}
 		} else {
-			log.Fatal("Resource Group: Three was an error: ", rgDelErr.Error())
+			log.Fatal("Resource Group: There was an error: ", rgDelErr.Error())
 		}
 
 	} else {
