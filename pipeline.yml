@@ -21,32 +21,12 @@ steps:
         echo "##vso[task.setvariable variable=MAJOR_VERSION]$(make print-VERSION)"
         echo "##vso[task.setvariable variable=REPOSITORY_NAME]$(make print-USER)"
         echo "##vso[task.setvariable variable=IMAGE_NAME]$(make print-IMAGE)"
-  - task: Docker@2
-    displayName: 'Build Image'
-    inputs:
-      command: build
-      repository: $(REPOSITORY_NAME)/$(IMAGE_NAME)
-      tags: $(MAJOR_VERSION).$(Build.BuildId)
-      Dockerfile: $(System.DefaultWorkingDirectory)/Dockerfile
-      buildContext: $(System.DefaultWorkingDirectory)
-
-  - task: Bash@3
-    displayName: 'Set Build Variables'
-    inputs:
-      targetType: 'inline'
-      script: |
-        echo "##vso[task.setvariable variable=MAJOR_VERSION]$(make print-VERSION)"
-        echo "##vso[task.setvariable variable=REPOSITORY_NAME]$(make print-USER)"
-        echo "##vso[task.setvariable variable=IMAGE_NAME]$(make print-IMAGE)"
   - task: CmdLine@2
     displayName: 'Install Dependencies'
     inputs:
       script: |
         apt update
         apt-get install -y gcc
-        echo $AWSBI_IMAGE_TAG
-    env: 
-      AWSBI_IMAGE_TAG: $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
   - task: GoTool@0
     displayName: 'ensure Go 1.15.2'
     inputs:
@@ -68,14 +48,16 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        echo $AWSBI_IMAGE_TAG
         make test 2>&1 | tee tests.output
         go-junit-report < tests.output > report.xml
+        docker tag $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION) $(registry_name)/$(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
       failOnStderr: true
     env:
+      K8S_HOST_PATH: "/tmp/tests-share/$(IMAGE_NAME)"
+      K8S_VOL_PATH: "/tests-share/$(IMAGE_NAME)"
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
       AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-      AWSBI_IMAGE_TAG: $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
+      AWSBI_IMAGE_TAG: $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION)
   - task: PublishTestResults@2
     inputs:
       testRunner: JUnit

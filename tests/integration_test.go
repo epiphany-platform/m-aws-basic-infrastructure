@@ -38,6 +38,9 @@ var (
 	imageTag                  string
 	awsAccessKey              string
 	awsSecretKey              string
+	k8sHostPath               string
+	k8sVolPath                string
+	stateFilePath             = "shared/state.yml"
 	sharedAbsoluteFilePath, _ = filepath.Abs("./shared")
 	mountDir                  = sharedAbsoluteFilePath + ":/shared"
 	dockerExecPath, _         = exec.LookPath("docker")
@@ -57,7 +60,6 @@ func TestMain(m *testing.M) {
 
 func TestOnInitWithDefaultsShouldCreateProperFileAndFolder(t *testing.T) {
 	// given
-	stateFilePath := "shared/state.yml"
 	expectedFileContentRegexp := "kind: state\nawsbi:\n  status: initialized"
 
 	// when
@@ -244,6 +246,15 @@ func setup() {
 		log.Fatalf("expected non-empty AWSBI_IMAGE_TAG environment variable")
 	}
 
+	k8sHostPath  = os.Getenv("K8S_HOST_PATH")
+	k8sVolPath   = os.Getenv("K8S_VOL_PATH")
+
+	if ( len(k8sHostPath) != 0 && len(k8sVolPath) != 0) {
+		sharedAbsoluteFilePath = k8sVolPath
+		mountDir               = k8sHostPath + ":/shared"
+		stateFilePath          = k8sVolPath + "/state.yml"
+	}
+
 	err := os.MkdirAll(sharedAbsoluteFilePath, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
@@ -258,7 +269,7 @@ func setup() {
 // cleans up artifacts from test build from disk
 func cleanupDiskTestStructure() {
 	log.Println("Starting cleanup.")
-	err := os.RemoveAll(sharedAbsoluteFilePath)
+	err := os.RemoveAll(sharedAbsoluteFilePath + "/*")
 	if err != nil {
 		log.Fatal("Cannot remove data folder. ", err)
 	}
