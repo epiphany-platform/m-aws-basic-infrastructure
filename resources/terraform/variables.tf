@@ -29,15 +29,23 @@ variable "nat_gateway_count" {
   type        = number
 }
 
+variable "vpc_address_space" {
+  description = "The address space of the VPC"
+  type        = string
+}
+
 variable "subnets" {
-  description = "Subnets configuration"
-  type = object({
-    private = object({
-      count = number
-    })
-    public = object({
-      count = number
-    })
+  type    = object({
+    private = list(object({
+      name                = string
+      availability_zone   = string
+      address_prefixes    = string
+      }))
+    public = list(object({
+      name                = string
+      availability_zone   = string
+      address_prefixes    = string
+      }))
   })
 }
 

@@ -14,6 +14,7 @@ module "ec2" {
   use_public_ip     = var.use_public_ip
   nat_gateway_count = var.nat_gateway_count
   subnets           = var.subnets
+  vpc_address_space = var.vpc_address_space
   region            = var.region
   key_name          = aws_key_pair.kp.key_name
   os                = var.os
