@@ -17,7 +17,7 @@ will have associated public IP address
 |M_NAT_GATEWAY_COUNT |number |1 |no |init |The number of NAT gateways
 to be created. Attached into subnets with round-robin
 
-|M_SUBNETS |list(object)
+|M_SUBNETS |list(map)
 |
 [source]
 ----

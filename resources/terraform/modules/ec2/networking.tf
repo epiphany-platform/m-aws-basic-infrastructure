@@ -40,7 +40,7 @@ resource "aws_security_group" "awsbi_security_group" {
 # --- Public ---
 
 resource "aws_subnet" "awsbi_public_subnet" {
-  count             = local.public_subnet_numbers
+  count             = length(var.subnets.public)
   vpc_id            = aws_vpc.awsbi_vpc.id
   cidr_block        = var.subnets.public[count.index].address_prefixes
   availability_zone = var.subnets.public[count.index].availability_zone == "any" ? element(data.aws_availability_zones.available.names, count.index) : var.subnets.public[count.index].availability_zone
@@ -75,7 +75,7 @@ resource "aws_route_table" "awsbi_route_table_public" {
 }
 
 resource "aws_route_table_association" "awsbi_route_association_public" {
-  count          = local.public_subnet_numbers
+  count          = length(var.subnets.public)
   subnet_id      = aws_subnet.awsbi_public_subnet[count.index].id
   route_table_id = aws_route_table.awsbi_route_table_public.id
 }
@@ -84,7 +84,7 @@ resource "aws_route_table_association" "awsbi_route_association_public" {
 
 
 resource "aws_subnet" "awsbi_private_subnet" {
-  count             = local.private_subnet_numbers
+  count             = length(var.subnets.private)
   vpc_id            = aws_vpc.awsbi_vpc.id
   cidr_block        = var.subnets.private[count.index].address_prefixes
   availability_zone = var.subnets.private[count.index].availability_zone == "any" ? element(data.aws_availability_zones.available.names, count.index) : var.subnets.private[count.index].availability_zone
@@ -134,7 +134,7 @@ resource "aws_route_table" "awsbi_route_table_private" {
 }
 
 resource "aws_route_table_association" "awsbi_route_association_private" {
-  count          = local.private_subnet_numbers
+  count          = length(var.subnets.private)
   subnet_id      = aws_subnet.awsbi_private_subnet[count.index].id
   route_table_id = element(aws_route_table.awsbi_route_table_private.*.id, count.index)
 }

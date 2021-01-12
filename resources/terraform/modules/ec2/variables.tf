@@ -59,7 +59,7 @@ variable "subnets" {
       }))
   })
   validation {
-    condition     = (length(var.subnets.private) > 0 && length(var.subnets.public) > 0) || length(var.subnets.public)> 0
+    condition     = (length(var.subnets.private) > 0 && length(var.subnets.public) > 0) || length(var.subnets.public) > 0
     error_message = "Subnets list needs to have at least one element."
   }
 }

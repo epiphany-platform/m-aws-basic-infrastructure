@@ -5,15 +5,14 @@ define _M_SUBNETS
     name: first_private_subnet,
     availability_zone: any,
     address_prefixes: 10.1.1.0/24
-    }],
+  }],
   public:
   [{
     name: first_public_subnet,
     availability_zone: any,
     address_prefixes: 10.1.2.0/24
-    }]
+  }]
 }
-
 endef
 
 M_VMS_COUNT ?= 1
