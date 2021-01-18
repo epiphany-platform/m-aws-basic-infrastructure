@@ -61,6 +61,27 @@ variable "subnets" {
   }
 }
 
+variable "security_groups" {
+  description = "Security groups configuration"
+  type        = list(object({
+    name        = string
+    rules       = object({
+      ingress = list(object({
+        protocol    = string
+        from_port   = number
+        to_port     = number
+        cidr_blocks = list(string)
+      }))
+      egress = list(object({
+        protocol    = string
+        from_port   = number
+        to_port     = number
+        cidr_blocks = list(string)
+      }))
+    })
+  }))
+}
+
 variable "os" {
   description = "Operating System to launch"
   type = string

@@ -31,7 +31,7 @@ variable "nat_gateway_count" {
 
 variable "subnets" {
   description = "Subnets configuration"
-  type = object({
+  type        = object({
     private = object({
       count = number
     })
@@ -39,6 +39,27 @@ variable "subnets" {
       count = number
     })
   })
+}
+
+variable "security_groups" {
+  description = "Security groups configuration"
+  type        = list(object({
+    name        = string
+    rules       = object({
+      ingress = list(object({
+        protocol    = string
+        from_port   = number
+        to_port     = number
+        cidr_blocks = list(string)
+      }))
+      egress = list(object({
+        protocol    = string
+        from_port   = number
+        to_port     = number
+        cidr_blocks = list(string)
+      }))
+    })
+  }))
 }
 
 variable "rsa_pub_path" {
