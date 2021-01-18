@@ -21,6 +21,7 @@ $(M_MODULE_SHORT):
   security_groups: $(M_SECURITY_GROUPS)
   rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
   os: $(M_OS)
+  vpc_address_space: $(M_ADDRESS_SPACE)  
 endef
 
 define M_STATE_INITIAL

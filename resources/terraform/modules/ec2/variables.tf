@@ -40,24 +40,27 @@ variable "key_name" {
   type        = string
 }
 
-variable "vpc_cidr_block" {
-  description = "The cidr block of the VPC"
-  default     = "10.1.0.0/20"
+variable "vpc_address_space" {
+  description = "The address space of the VPC"
+  type        = string
 }
 
 variable "subnets" {
-  description = "Subnets configuration"
-  type = object({
-    private = object({
-      count = number
-    })
-    public = object({
-      count = number
-    })
+  type    = object({
+    private = list(object({
+      name                = string
+      availability_zone   = string
+      address_prefixes    = string
+      }))
+    public = list(object({
+      name                = string
+      availability_zone   = string
+      address_prefixes    = string
+      }))
   })
   validation {
-    condition     = (var.subnets.private.count > 0 && var.subnets.public.count > 0) || var.subnets.public.count > 0
-    error_message = "At least one subnet should be created."
+    condition     = (length(var.subnets.private) > 0 && length(var.subnets.public) > 0) || length(var.subnets.public) > 0
+    error_message = "Subnets list needs to have at least one element."
   }
 }
 
