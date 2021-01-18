@@ -33,6 +33,36 @@ to be created. Attached into subnets with round-robin
 |no |init |Defines number of public and private subnets
 that are created in available AZs with round-robin
 
+|M_SECURITY_GROUPS |map
+|
+[source]
+----
+[
+  {
+    name: default_sg,
+    rules: {
+      ingress: [
+        {
+          protocol: "-1",
+          from_port: 0,
+          to_port: 0,
+          cidr_blocks: ["0.0.0.0/0"]
+        }
+      ],
+      egress: [
+      	{
+          protocol: "-1",
+          from_port: 0,
+          to_port: 0,
+          cidr_blocks: ["0.0.0.0/0"]
+        }
+      ]
+    }
+  }
+]
+----
+|no |init |Defines the list of security groups to attach virtual machines to
+
 |M_NAME |string |epiphany |no |init |Name to be used on all resources
 as a prefix
 
