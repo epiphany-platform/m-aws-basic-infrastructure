@@ -20,6 +20,7 @@ $(M_MODULE_SHORT):
   subnets: $(M_SUBNETS)
   rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
   os: $(M_OS)
+  vpc_address_space: $(M_ADDRESS_SPACE)  
 endef
 
 define M_STATE_INITIAL

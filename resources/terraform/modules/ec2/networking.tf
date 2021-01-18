@@ -3,7 +3,7 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_vpc" "awsbi_vpc" {
-  cidr_block            = var.vpc_cidr_block
+  cidr_block            = var.vpc_address_space
   instance_tenancy      = "default"
   enable_dns_support    = "true"
   enable_dns_hostnames  = "true"
@@ -40,13 +40,13 @@ resource "aws_security_group" "awsbi_security_group" {
 # --- Public ---
 
 resource "aws_subnet" "awsbi_public_subnet" {
-  count             = length(local.public_cidr_blocks)
+  count             = length(var.subnets.public)
   vpc_id            = aws_vpc.awsbi_vpc.id
-  cidr_block        = local.public_cidr_blocks[count.index]
-  availability_zone = element(data.aws_availability_zones.available.names, count.index)
+  cidr_block        = var.subnets.public[count.index].address_prefixes
+  availability_zone = var.subnets.public[count.index].availability_zone == "any" ? element(data.aws_availability_zones.available.names, count.index) : var.subnets.public[count.index].availability_zone
 
   tags = {
-    Name           = "${var.name}-subnet-public${count.index}"
+    Name           = var.subnets.public[count.index].name
     resource_group = var.name
   }
 }
@@ -75,21 +75,22 @@ resource "aws_route_table" "awsbi_route_table_public" {
 }
 
 resource "aws_route_table_association" "awsbi_route_association_public" {
-  count          = length(local.public_cidr_blocks)
+  count          = length(var.subnets.public)
   subnet_id      = aws_subnet.awsbi_public_subnet[count.index].id
   route_table_id = aws_route_table.awsbi_route_table_public.id
 }
 
 # --- Private ---
 
+
 resource "aws_subnet" "awsbi_private_subnet" {
-  count             = length(local.private_cidr_blocks)
+  count             = length(var.subnets.private)
   vpc_id            = aws_vpc.awsbi_vpc.id
-  cidr_block        = local.private_cidr_blocks[count.index]
-  availability_zone = element(data.aws_availability_zones.available.names, count.index)
+  cidr_block        = var.subnets.private[count.index].address_prefixes
+  availability_zone = var.subnets.private[count.index].availability_zone == "any" ? element(data.aws_availability_zones.available.names, count.index) : var.subnets.private[count.index].availability_zone
 
   tags = {
-    Name           = "${var.name}-subnet-private${count.index}"
+    Name           = var.subnets.private[count.index].name
     resource_group = var.name
   }
 }
@@ -133,7 +134,7 @@ resource "aws_route_table" "awsbi_route_table_private" {
 }
 
 resource "aws_route_table_association" "awsbi_route_association_private" {
-  count          = length(local.private_cidr_blocks)
+  count          = length(var.subnets.private)
   subnet_id      = aws_subnet.awsbi_private_subnet[count.index].id
   route_table_id = element(aws_route_table.awsbi_route_table_private.*.id, count.index)
 }

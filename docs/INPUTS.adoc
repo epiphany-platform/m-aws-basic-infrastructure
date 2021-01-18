@@ -11,27 +11,33 @@
 
 |M_VMS_COUNT |number |1 |no |init |Number of instances to launch
 
-|M_PUBLIC_IPS |bool |true |no |init |If true, the EC2 instance
+|M_PUBLIC_IPS |bool |false |no |init |If true, the EC2 instance
 will have associated public IP address
 
 |M_NAT_GATEWAY_COUNT |number |1 |no |init |The number of NAT gateways
 to be created. Attached into subnets with round-robin
 
-|M_SUBNETS |map
+|M_SUBNETS |list(map)
 |
 [source]
 ----
 {
-  private: {
-    count: 1
-  },
-  public: {
-    count: 1
-  }
+  private:
+  [{
+    name: first_private_subnet,
+    availability_zone: any,
+    address_prefixes: 10.1.1.0/24
+  }],
+  public:
+  [{
+    name: first_public_subnet,
+    availability_zone: any,
+    address_prefixes: 10.1.2.0/24
+  }]
 }
 ----
-|no |init |Defines number of public and private subnets
-that are created in available AZs with round-robin
+|no |init |Defines public and private subnets
+that are created in specified or any available AZs
 
 |M_NAME |string |epiphany |no |init |Name to be used on all resources
 as a prefix
@@ -41,6 +47,8 @@ shared directory
 
 |M_REGION |string |eu-central-1 |no |init |AWS Region to launch
 module in
+
+|M_ADDRESS_SPACE |string |10.1.0.0/20 |no |init |VPC address space
 
 |M_OS |string |ubuntu |no |init |Operating System to launch.
 Possible values: ubuntu/redhat
