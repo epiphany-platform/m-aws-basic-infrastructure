@@ -25,6 +25,12 @@ define _M_SECURITY_GROUPS
           protocol: "-1",
           from_port: 0,
           to_port: 0,
+          cidr_blocks: ["10.1.0.0/20"]
+        },
+        {
+          protocol: "tcp",
+          from_port: 22,
+          to_port: 22,
           cidr_blocks: ["0.0.0.0/0"]
         }
       ],
