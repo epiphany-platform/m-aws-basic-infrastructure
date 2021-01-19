@@ -15,24 +15,32 @@ resource "aws_vpc" "awsbi_vpc" {
 }
 
 resource "aws_security_group" "awsbi_security_group" {
-  name    = "${var.name}-sg"
+  count   = length(var.security_groups)
+  name    = var.security_groups[count.index].name
   vpc_id  = aws_vpc.awsbi_vpc.id
 
-  ingress {
-    protocol    = "tcp"
-    from_port   = 22
-    to_port     = 22
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.security_groups[count.index].rules.ingress
+    content {
+      protocol    = ingress.value["protocol"]
+      from_port   = ingress.value["from_port"]
+      to_port     = ingress.value["to_port"]
+      cidr_blocks = ingress.value["cidr_blocks"]
+    }
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "egress" {
+    for_each = var.security_groups[count.index].rules.egress
+    content {
+      protocol    = egress.value["protocol"]
+      from_port   = egress.value["from_port"]
+      to_port     = egress.value["to_port"]
+      cidr_blocks = egress.value["cidr_blocks"]
+    }
   }
 
   tags = {
+    Name           = "${var.name}-sg-${count.index}"
     resource_group = var.name
   }
 }

@@ -2,7 +2,8 @@
 
 Epiphany Module: AWS Basic Infrastructure
 
-AwsBI module is reponsible for providing basic cloud resources (eg. resource groups, virtual networks, subnets, virtual machines etc.) which will be used by upcoming modules.
+AwsBI module is reponsible for providing basic cloud resources (eg. resource groups, virtual networks, subnets, virtual
+machines etc.) which will be used by upcoming modules.
 
 # Basic usage
 
@@ -47,8 +48,8 @@ or directly using Docker:
   docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:latest init M_VMS_COUNT=2 M_PUBLIC_IPS=true M_NAME=epiphany-modules-awsbi
   ```
 
-  This command will create configuration file of AwsBI module in /tmp/shared/awsbi/awsbi-config.yml. You can investigate what is stored in that file.
-  Available parameters are listed in the [inputs](docs/INPUTS.adoc) document.
+  This command will create configuration file of AwsBI module in /tmp/shared/awsbi/awsbi-config.yml. You can investigate
+  what is stored in that file. Available parameters are listed in the [inputs](docs/INPUTS.adoc) document.
 
 * Plan and apply AwsBI module:
 
@@ -57,15 +58,39 @@ or directly using Docker:
   docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:latest apply M_AWS_ACCESS_KEY=xxx M_AWS_SECRET_KEY=xxx
   ```
 
-  Running those commands should create a bunch of AWS resources (resource group, vpc, subnet, ec2 instances and so on). 
+  Running those commands should create a bunch of AWS resources (resource group, vpc, subnet, ec2 instances and so on).
   You can verify it in AWS Management Console.
+
+* Passing complex structures as a parameter value
+
+  It is possible that you need to pass a complex structure parameter value, such as `M_SUBNETS` or `M_SECURITY_GROUPS`,
+  it can be achieved by 2 ways:
+
+    1. Changing `defaults.mk` and building new Docker image with another default value
+    2. Passing it as usual with a long string:
+
+    ```shell
+    docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:0.0.1 init \
+      M_VMS_COUNT=2 \
+      M_PUBLIC_IPS=true \
+      M_NAME=epiphany-modules-awsbi \
+      M_REGION=eu-west-3 \
+      M_SECURITY_GROUPS='[ { name: default_sg, rules: { ingress: [ { protocol: "-1", from_port: 0, to_port: 0, cidr_blocks: ["10.1.0.0/20"] }, { protocol: "tcp", from_port: 22, to_port: 22, cidr_blocks: ["0.0.0.0/0"] }, { protocol: "tcp", from_port: 443, to_port: 443, cidr_blocks: ["0.0.0.0/0"] } ], egress: [ { protocol: "-1", from_port: 0, to_port: 0, cidr_blocks: ["0.0.0.0/0"] } ] } } ]'
+    ```
+
+* Destroy created infrastructure
+
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:latest plan-destroy M_AWS_ACCESS_KEY=xxx M_AWS_SECRET_KEY=xxx
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/awsbi:latest destroy M_AWS_ACCESS_KEY=xxx M_AWS_SECRET_KEY=xxx
+  ```
 
 ## Run module with provided example
 
 ### Prepare config file
 
-Prepare your own variables in vars.mk file to use in the building process.
-Sample file (examples/basic_flow/vars.mk.sample):
+Prepare your own variables in vars.mk file to use in the building process. Sample file (
+examples/basic_flow/vars.mk.sample):
 
   ```shell
   AWS_ACCESS_KEY_ID = "xxx"
@@ -128,6 +153,7 @@ The output from this module is:
 ## Integration tests execution
 
 Prior to run integration tests on for AWS module specify variables on OS where you want to run tests:
+
 - AWS_ACCESS_KEY_ID - this is your access key
 - AWS_SECRET_ACCESS_KEY - this is your secret
 - AWSBI_IMAGE_TAG - this is full tag of docker image that you want to test e.g. "epiphanyplatform/awsbi:0.0.1"

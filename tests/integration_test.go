@@ -30,7 +30,7 @@ const (
 	awsTagName  = "resource_group"
 	awsTagValue = "bi-module"
 	moduleName  = "bi-module"
-	awsRegion   = "eu-central-1"
+	awsRegion   = "eu-west-3"
 	sshKeyName  = "vms_rsa"
 	retries     = 30
 )
@@ -64,7 +64,7 @@ func TestOnInitWithDefaultsShouldCreateProperFileAndFolder(t *testing.T) {
 	expectedFileContentRegexp := "kind: state\nawsbi:\n  status: initialized"
 
 	// when
-	_, stderr := runDocker(t, "init", "M_NAME="+moduleName)
+	_, stderr := runDocker(t, "init", "M_NAME="+moduleName, "M_REGION="+awsRegion)
 
 	if stderr.Len() > 0 {
 		t.Fatal("There was an error during executing a command. ", string(stderr.Bytes()))

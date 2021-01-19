@@ -53,9 +53,7 @@ resource "aws_instance" "awsbi" {
     volume_size = var.root_volume_size
   }
 
-  vpc_security_group_ids = [
-    aws_security_group.awsbi_security_group.id
-  ]
+  vpc_security_group_ids = aws_security_group.awsbi_security_group.*.id
 
   tags = {
     Name = "${var.name}-instance${count.index}"

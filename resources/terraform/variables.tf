@@ -35,18 +35,40 @@ variable "vpc_address_space" {
 }
 
 variable "subnets" {
-  type    = object({
+  description = "Subnets configuration"
+  type        = object({
     private = list(object({
       name                = string
       availability_zone   = string
       address_prefixes    = string
-      }))
+    }))
     public = list(object({
       name                = string
       availability_zone   = string
       address_prefixes    = string
-      }))
+    }))
   })
+}
+
+variable "security_groups" {
+  description = "Security groups configuration"
+  type        = list(object({
+    name        = string
+    rules       = object({
+      ingress = list(object({
+        protocol    = string
+        from_port   = number
+        to_port     = number
+        cidr_blocks = list(string)
+      }))
+      egress = list(object({
+        protocol    = string
+        from_port   = number
+        to_port     = number
+        cidr_blocks = list(string)
+      }))
+    })
+  }))
 }
 
 variable "rsa_pub_path" {
