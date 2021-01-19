@@ -63,8 +63,8 @@ or directly using Docker:
 
 * Passing complex structures as a parameter value
 
-  It is possible that you need to pass a complex structure parameter value, such as `M_SUBNETS or M_SECURITY_GROUPS, it
-  can be achieved by 2 ways:
+  It is possible that you need to pass a complex structure parameter value, such as `M_SUBNETS` or `M_SECURITY_GROUPS`,
+  it can be achieved by 2 ways:
 
     1. Changing `defaults.mk` and building new Docker image with another default value
     2. Passing it as usual with a long string:
