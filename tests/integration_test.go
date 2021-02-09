@@ -247,13 +247,13 @@ func setup() {
 		log.Fatalf("expected non-empty AWSBI_IMAGE_TAG environment variable")
 	}
 
-	k8sHostPath  = os.Getenv("K8S_HOST_PATH")
-	k8sVolPath   = os.Getenv("K8S_VOL_PATH")
+	k8sHostPath = os.Getenv("K8S_HOST_PATH")
+	k8sVolPath = os.Getenv("K8S_VOL_PATH")
 
-	if ( len(k8sHostPath) != 0 && len(k8sVolPath) != 0) {
+	if len(k8sHostPath) != 0 && len(k8sVolPath) != 0 {
 		sharedAbsoluteFilePath = k8sVolPath
-		mountDir               = k8sHostPath + ":/shared"
-		stateFilePath          = k8sVolPath + "/state.yml"
+		mountDir = k8sHostPath + ":/shared"
+		stateFilePath = k8sVolPath + "/state.yml"
 	}
 
 	err := os.MkdirAll(sharedAbsoluteFilePath, os.ModePerm)
@@ -294,7 +294,6 @@ func cleanupAWSResources() {
 	rgClient := resourcegroups.New(newSession)
 
 	rgName := moduleName + "-rg"
-	kpName := moduleName + "-kp"
 
 	rgResourcesList, errResourcesList := rgClient.ListGroupResources(&resourcegroups.ListGroupResourcesInput{
 		GroupName: aws.String(rgName),
@@ -356,7 +355,7 @@ func cleanupAWSResources() {
 
 	removeResourceGroup(newSession, rgName)
 
-	removeKeyPair(newSession, kpName)
+	removeKeyPair(newSession, awsTagName, awsTagValue)
 
 }
 
@@ -376,8 +375,8 @@ func runDocker(t *testing.T, params ...string) (bytes.Buffer, bytes.Buffer) {
 	}
 
 	if err := command.Run(); err != nil {
-	    t.Log("Stderr: ", string(stderr.Bytes()))
-	    t.Fatal("There was an error running command:", err)
+		t.Log("Stderr: ", string(stderr.Bytes()))
+		t.Fatal("There was an error running command:", err)
 	}
 	t.Log("Stdout: ", string(stdout.Bytes()))
 
@@ -694,17 +693,45 @@ func removeVpc(session *session.Session, vpcsToRemove []*resourcegroups.Resource
 }
 
 // removes key pairs using AWS session based on resource identifiers that belong to resource group
-func removeKeyPair(session *session.Session, kpName string) {
+func removeKeyPair(session *session.Session, filterTagName, filterTagValue string) {
 
 	ec2Client := ec2.New(session)
 
+	keyPairDescInp := &ec2.DescribeKeyPairsInput{
+		Filters: []*ec2.Filter{
+			{
+				Name: aws.String("tag:" + filterTagName),
+				Values: []*string{
+					aws.String(filterTagValue),
+				},
+			},
+		},
+	}
+
+	describe, err := ec2Client.DescribeKeyPairs(keyPairDescInp)
+	if err != nil {
+		log.Fatal("Key Pair: Cannot get Key Pair list.", err)
+	}
+
+	if len(describe.KeyPairs) == 0 {
+		log.Printf("There is no  key pairs with the tag %s:%s", filterTagName, filterTagValue)
+		return
+	}
+
+	// Do not remove key pairs if there are several ones with the same tag
+	// Resources created by pipeline tests have unique tag values
+	if len(describe.KeyPairs) > 1 {
+		log.Printf("There are several key pairs with the tag %s:%s that will not be removed", filterTagName, filterTagValue)
+		return
+	}
+
 	removeKeyInp := &ec2.DeleteKeyPairInput{
-		KeyName: &kpName,
+		KeyName: describe.KeyPairs[0].KeyName,
 	}
 
 	output, err := ec2Client.DeleteKeyPair(removeKeyInp)
 	if err != nil {
-		log.Fatal("Key Pair: Deleting key pair error: ", err)
+		log.Fatalf("Key Pair: Deleting key pair error: %s", err)
 	}
 	log.Println("Key Pair: Deleting key pair: ", output)
 }
@@ -712,53 +739,53 @@ func removeKeyPair(session *session.Session, kpName string) {
 // releases elastic IPs using AWS session based on resource tag
 func releaseAddresses(session *session.Session) {
 
-    ec2Client := ec2.New(session)
+	ec2Client := ec2.New(session)
 
-    eipDescInp := &ec2.DescribeAddressesInput {
-        Filters: []*ec2.Filter{
-            {
-                Name: aws.String("tag:" + awsTagName),
-                Values: []*string{
-                    aws.String(awsTagValue),
-                },
-            },
-        },
-    }
+	eipDescInp := &ec2.DescribeAddressesInput{
+		Filters: []*ec2.Filter{
+			{
+				Name: aws.String("tag:" + awsTagName),
+				Values: []*string{
+					aws.String(awsTagValue),
+				},
+			},
+		},
+	}
 
-    describeEips, err := ec2Client.DescribeAddresses(eipDescInp)
-    if err != nil {
-        log.Fatal("EIP: Cannot get EIP list.", err)
-    }
+	describeEips, err := ec2Client.DescribeAddresses(eipDescInp)
+	if err != nil {
+		log.Fatal("EIP: Cannot get EIP list.", err)
+	}
 
-    for _, eip := range describeEips.Addresses {
+	for _, eip := range describeEips.Addresses {
 
-        log.Printf("EIP: Releasing EIP with AllocationId: %s", *eip.AllocationId)
+		log.Printf("EIP: Releasing EIP with AllocationId: %s", *eip.AllocationId)
 
-        eipToReleaseInp := &ec2.ReleaseAddressInput{
-            AllocationId: eip.AllocationId,
-        }
+		eipToReleaseInp := &ec2.ReleaseAddressInput{
+			AllocationId: eip.AllocationId,
+		}
 
-        found := true
-        for retry := 0; retry <= retries && found; retry++ {
-            _, err := ec2Client.ReleaseAddress(eipToReleaseInp)
-            if err != nil {
-                if aerr, ok := err.(awserr.Error); ok {
-                    if aerr.Code() == "InvalidAllocationID.NotFound" {
-                        log.Print("EIP: Element not found.", err)
-                        found = false
-                        continue
-                    }
-                    if aerr.Code() != "AuthFailure" && aerr.Code() != "InvalidAllocationID.NotFound" {
-                        log.Fatal("EIP: Releasing EIP error: ", err)
-                    }
-                } else {
-                    log.Fatal("EIP: There was an error: ", err.Error())
-                }
-            }
-            log.Println("EIP: Releasing EIP. Retry: ", retry)
-            time.Sleep(5 * time.Second)
-        }
-    }
+		found := true
+		for retry := 0; retry <= retries && found; retry++ {
+			_, err := ec2Client.ReleaseAddress(eipToReleaseInp)
+			if err != nil {
+				if aerr, ok := err.(awserr.Error); ok {
+					if aerr.Code() == "InvalidAllocationID.NotFound" {
+						log.Print("EIP: Element not found.", err)
+						found = false
+						continue
+					}
+					if aerr.Code() != "AuthFailure" && aerr.Code() != "InvalidAllocationID.NotFound" {
+						log.Fatal("EIP: Releasing EIP error: ", err)
+					}
+				} else {
+					log.Fatal("EIP: There was an error: ", err.Error())
+				}
+			}
+			log.Println("EIP: Releasing EIP. Retry: ", retry)
+			time.Sleep(5 * time.Second)
+		}
+	}
 }
 
 // removes resource groups using AWS session based on name
