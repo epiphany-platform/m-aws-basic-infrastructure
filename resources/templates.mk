@@ -13,15 +13,13 @@ define M_CONFIG_CONTENT
 kind: $(M_MODULE_SHORT)-config
 $(M_MODULE_SHORT):
   name: $(M_NAME)
-  instance_count: $(M_VMS_COUNT)
   region: $(M_REGION)
-  use_public_ip: $(M_PUBLIC_IPS)
   nat_gateway_count: $(M_NAT_GATEWAY_COUNT)
+  rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
+  vpc_address_space: $(M_ADDRESS_SPACE)  
   subnets: $(M_SUBNETS)
   security_groups: $(M_SECURITY_GROUPS)
-  rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
-  os: $(M_OS)
-  vpc_address_space: $(M_ADDRESS_SPACE)  
+  vm_groups: $(M_VM_GROUPS)
 endef
 
 define M_STATE_INITIAL

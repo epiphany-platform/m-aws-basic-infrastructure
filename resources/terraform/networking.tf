@@ -10,7 +10,7 @@ resource "aws_vpc" "awsbi_vpc" {
 
   tags = {
     Name           = "${var.name}-vpc"
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 }
 
@@ -41,7 +41,7 @@ resource "aws_security_group" "awsbi_security_group" {
 
   tags = {
     Name           = "${var.name}-sg-${count.index}"
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 }
 
@@ -55,37 +55,39 @@ resource "aws_subnet" "awsbi_public_subnet" {
 
   tags = {
     Name           = var.subnets.public[count.index].name
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 }
 
 resource "aws_internet_gateway" "awsbi_internet_gateway" {
+  count  = local.use_internet_gateway ? 1 : 0
   vpc_id = aws_vpc.awsbi_vpc.id
 
   tags = {
     Name           = "${var.name}-ig"
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 }
 
 resource "aws_route_table" "awsbi_route_table_public" {
+  count  = local.use_internet_gateway ? 1 : 0
   vpc_id  = aws_vpc.awsbi_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.awsbi_internet_gateway.id
+    gateway_id = aws_internet_gateway.awsbi_internet_gateway[0].id
   }
 
   tags = {
     Name           = "${var.name}-rt-public"
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 }
 
 resource "aws_route_table_association" "awsbi_route_association_public" {
   count          = length(var.subnets.public)
   subnet_id      = aws_subnet.awsbi_public_subnet[count.index].id
-  route_table_id = aws_route_table.awsbi_route_table_public.id
+  route_table_id = aws_route_table.awsbi_route_table_public[0].id
 }
 
 # --- Private ---
@@ -99,35 +101,35 @@ resource "aws_subnet" "awsbi_private_subnet" {
 
   tags = {
     Name           = var.subnets.private[count.index].name
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 }
 
 resource "aws_eip" "awsbi_nat_gateway" {
-  count = var.nat_gateway_count
+  count = local.use_nat_gateway ? var.nat_gateway_count : 0  
   vpc   = true
 
   tags = {
     Name           = "${var.name}-eip${count.index}"
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 }
 
 resource "aws_nat_gateway" "awsbi_nat_gateway" {
-  count         = var.nat_gateway_count
+  count         = local.use_nat_gateway ? var.nat_gateway_count : 0
   allocation_id = aws_eip.awsbi_nat_gateway[count.index].id
   subnet_id     = element(aws_subnet.awsbi_public_subnet.*.id, count.index)
 
   tags = {
     Name           = "${var.name}-ng${count.index}"
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 
   depends_on = [ aws_internet_gateway.awsbi_internet_gateway ]
 }
 
 resource "aws_route_table" "awsbi_route_table_private" {
-  count = var.nat_gateway_count
+  count  = local.use_nat_gateway ? var.nat_gateway_count : 0
   vpc_id = aws_vpc.awsbi_vpc.id
 
   route {
@@ -137,12 +139,12 @@ resource "aws_route_table" "awsbi_route_table_private" {
 
   tags = {
     Name           = "${var.name}-rt-private${count.index}"
-    resource_group = var.name
+    resource_group = "${var.name}-rg"
   }
 }
 
 resource "aws_route_table_association" "awsbi_route_association_private" {
-  count          = length(var.subnets.private)
+  count          = local.use_nat_gateway ? length(var.subnets.private) : 0
   subnet_id      = aws_subnet.awsbi_private_subnet[count.index].id
   route_table_id = element(aws_route_table.awsbi_route_table_private.*.id, count.index)
 }
