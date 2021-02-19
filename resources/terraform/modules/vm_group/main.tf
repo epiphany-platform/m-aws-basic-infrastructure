@@ -8,8 +8,8 @@ data "aws_subnet" "selected" {
 }
 
 data "aws_security_group" "selected" {
-  count = length(var.vm_group.sg_names)
-  name  = var.vm_group.sg_names[count.index]
+  count  = length(var.vm_group.sg_names)
+  name   = var.vm_group.sg_names[count.index]
   vpc_id = var.vpc_id
 }
 
@@ -37,7 +37,7 @@ resource "aws_instance" "awsbi" {
   associate_public_ip_address = var.vm_group.use_public_ip
   key_name                    = var.key_name
 
-  vpc_security_group_ids = data.aws_security_group.selected.*.id 
+  vpc_security_group_ids      = data.aws_security_group.selected.*.id 
 
   tags = {
     Name = "${var.name}-${var.vm_group.name}-${count.index}"

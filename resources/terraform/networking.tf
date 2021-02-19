@@ -71,7 +71,7 @@ resource "aws_internet_gateway" "awsbi_internet_gateway" {
 
 resource "aws_route_table" "awsbi_route_table_public" {
   count  = local.use_internet_gateway ? 1 : 0
-  vpc_id  = aws_vpc.awsbi_vpc.id
+  vpc_id = aws_vpc.awsbi_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"

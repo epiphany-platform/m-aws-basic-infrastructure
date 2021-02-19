@@ -28,7 +28,7 @@ variable vm_group {
     })
     data_disks    = list(object({
       device_name = string
-      disk_size_gb = number
+      disk_size_gb= number
       type        = string
     }))
   })
