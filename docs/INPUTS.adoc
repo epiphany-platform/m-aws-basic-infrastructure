@@ -46,8 +46,8 @@ that are created in specified or any available AZs
   subnet_names: ["first_private_subnet"],
   sg_names: ["default_sg"],
   vm_image: {
-    ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2", # In case of Ubuntu: "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200611"
-    owner: "309956199498", # In case of Ubuntu: "099720109477"
+    ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2", #In case of Ubuntu: "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200611"
+    owner: "309956199498", #In case of Ubuntu: "099720109477"
   },
   data_disks: [
     {
