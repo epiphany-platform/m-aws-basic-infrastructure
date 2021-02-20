@@ -10,7 +10,7 @@ resource "aws_vpc" "awsbi_vpc" {
 
   tags = {
     Name           = "${var.name}-vpc"
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 }
 
@@ -41,7 +41,7 @@ resource "aws_security_group" "awsbi_security_group" {
 
   tags = {
     Name           = "${var.name}-sg-${count.index}"
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 }
 
@@ -55,7 +55,7 @@ resource "aws_subnet" "awsbi_public_subnet" {
 
   tags = {
     Name           = var.subnets.public[count.index].name
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 }
 
@@ -65,7 +65,7 @@ resource "aws_internet_gateway" "awsbi_internet_gateway" {
 
   tags = {
     Name           = "${var.name}-ig"
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 }
 
@@ -80,7 +80,7 @@ resource "aws_route_table" "awsbi_route_table_public" {
 
   tags = {
     Name           = "${var.name}-rt-public"
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 }
 
@@ -101,17 +101,17 @@ resource "aws_subnet" "awsbi_private_subnet" {
 
   tags = {
     Name           = var.subnets.private[count.index].name
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 }
 
 resource "aws_eip" "awsbi_nat_gateway" {
-  count = local.use_nat_gateway ? var.nat_gateway_count : 0  
+  count = local.use_nat_gateway ? var.nat_gateway_count : 0 
   vpc   = true
 
   tags = {
     Name           = "${var.name}-eip${count.index}"
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 }
 
@@ -122,7 +122,7 @@ resource "aws_nat_gateway" "awsbi_nat_gateway" {
 
   tags = {
     Name           = "${var.name}-ng${count.index}"
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 
   depends_on = [ aws_internet_gateway.awsbi_internet_gateway ]
@@ -139,7 +139,7 @@ resource "aws_route_table" "awsbi_route_table_private" {
 
   tags = {
     Name           = "${var.name}-rt-private${count.index}"
-    resource_group = "${var.name}"
+    resource_group = var.name
   }
 }
 
