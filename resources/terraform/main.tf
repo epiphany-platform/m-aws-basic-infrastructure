@@ -2,7 +2,7 @@ resource "aws_key_pair" "kp" {
   key_name_prefix   = "${var.name}-kp"
   public_key = file(var.rsa_pub_path)
   tags = {
-    resource_group = "${var.name}-rg"
+    resource_group = "${var.name}"
   }
 }
 
@@ -25,7 +25,7 @@ resource "aws_resourcegroups_group" "rg" {
   "TagFilters": [
     {
       "Key": "resource_group",
-      "Values": ["${var.name}-rg"]
+      "Values": ["${var.name}"]
     }
   ]
 }

@@ -41,7 +41,7 @@ resource "aws_instance" "awsbi" {
 
   tags = {
     Name = "${var.name}-${var.vm_group.name}-${count.index}"
-    resource_group = "${var.name}-rg"
+    resource_group = "${var.name}"
   }
 }
 
