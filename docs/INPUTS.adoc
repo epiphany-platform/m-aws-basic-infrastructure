@@ -46,8 +46,8 @@ that are created in specified or any available AZs
   subnet_names: ["first_private_subnet"],
   sg_names: ["default_sg"],
   vm_image: {
-    ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2", #In case of Ubuntu: "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200611"
-    owner: "309956199498", #In case of Ubuntu: "099720109477"
+    ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2",
+    owner: "309956199498",
   },
   data_disks: [
     {
@@ -58,8 +58,8 @@ that are created in specified or any available AZs
   ]
 }
 ----
-|no |init |Defines vm groups with specified parameters. In order to use public IP, public subnet must be created and used by vm group. :warning:
-Possible to create VPC with a single public subnet, VPC with public and private subnets (NAT), VPC with public and private subnets (without NAT) or VPC with only private subnets.
+|no |init |Defines vm groups with specified parameters. 
+
 
 |M_SECURITY_GROUPS |map
 |
