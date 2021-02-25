@@ -3,30 +3,19 @@ variable "name" {
   type        = string
 }
 
-variable "instance_count" {
-  description = "Number of instances to launch"
-  type        = number
-}
-
-variable "root_volume_size" {
-  description = "The size of the root volume in gibibytes (GiB)"
-  type        = number
-  default     = 64
-}
-
 variable "region" {
   description = "Region to launch in"
   type        = string
 }
 
-variable "use_public_ip" {
-  description = "If true, the EC2 instance will have associated public IP address"
-  type        = bool
-}
-
 variable "nat_gateway_count" {
   description = "The number of nat gateways to create"
   type        = number
+}
+
+variable "virtual_private_gateway" {
+  description = "Virtual private gateway for VPN connection"
+  type        = bool
 }
 
 variable "vpc_address_space" {
@@ -48,6 +37,10 @@ variable "subnets" {
       address_prefixes    = string
     }))
   })
+  validation {
+    condition     = length(var.subnets.private) > 0 || length(var.subnets.public) > 0
+    error_message = "You must specify at least one subnet."
+  }
 }
 
 variable "security_groups" {
@@ -75,7 +68,23 @@ variable "rsa_pub_path" {
   type = string
 }
 
-variable "os" {
-  description = "Operating System to launch"
-  type = string
+variable vm_groups {
+  description = "The list of VM group definition objects"
+  type        = list(object({
+    name          = string
+    vm_count      = number
+    vm_size       = string
+    use_public_ip = bool
+    subnet_names  = list(string)
+    sg_names      = list(string)
+    vm_image      = object({
+      ami         = string
+      owner       = string
+    })
+    data_disks    = list(object({
+      device_name = string
+      disk_size_gb= number
+      type        = string
+    }))
+  }))
 }

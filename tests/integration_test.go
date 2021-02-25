@@ -92,7 +92,7 @@ func TestOnInitWithDefaultsShouldCreateProperFileAndFolder(t *testing.T) {
 
 func TestOnPlanWithDefaultsShouldDisplayPlan(t *testing.T) {
 	// given
-	expectedOutputRegexp := ".*Plan: 14 to add, 0 to change, 0 to destroy.*"
+	expectedOutputRegexp := ".*Plan: 16 to add, 0 to change, 0 to destroy.*"
 
 	// when
 	stdout, stderr := runDocker(t, "plan", awsAccessKey, awsSecretKey)
@@ -117,7 +117,7 @@ func TestOnPlanWithDefaultsShouldDisplayPlan(t *testing.T) {
 
 func TestOnApplyShouldCreateEnvironment(t *testing.T) {
 	// given
-	expectedOutputRegexp := ".*Apply complete! Resources: 14 added, 0 changed, 0 destroyed.*"
+	expectedOutputRegexp := ".*Apply complete! Resources: 16 added, 0 changed, 0 destroyed.*"
 
 	// when
 	stdout, stderr := runDocker(t, "apply", awsAccessKey, awsSecretKey)
@@ -181,7 +181,7 @@ func checkNumberOfVms(t *testing.T) {
 
 func TestOnDestroyPlanShouldDisplayDestroyPlan(t *testing.T) {
 	// given
-	expectedOutputRegexp := "Plan: 0 to add, 0 to change, 14 to destroy"
+	expectedOutputRegexp := "Plan: 0 to add, 0 to change, 16 to destroy"
 
 	// when
 	stdout, stderr := runDocker(t, "plan-destroy", awsAccessKey, awsSecretKey)
@@ -205,7 +205,7 @@ func TestOnDestroyPlanShouldDisplayDestroyPlan(t *testing.T) {
 
 func TestOnDestroyShouldDestroyEnvironment(t *testing.T) {
 	// given
-	expectedOutputRegexp := "Apply complete! Resources: 0 added, 0 changed, 14 destroyed."
+	expectedOutputRegexp := "Apply complete! Resources: 0 added, 0 changed, 16 destroyed."
 
 	// when
 	stdout, stderr := runDocker(t, "destroy", awsAccessKey, awsSecretKey)

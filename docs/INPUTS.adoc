@@ -9,13 +9,8 @@
 |AWS_SECRET_ACCESS_KEY |string |unset |yes |plan, apply, plan-destroy, destroy
 |AWS access key secret
 
-|M_VMS_COUNT |number |1 |no |init |Number of instances to launch
-
-|M_PUBLIC_IPS |bool |false |no |init |If true, the EC2 instance
-will have associated public IP address
-
 |M_NAT_GATEWAY_COUNT |number |1 |no |init |The number of NAT gateways
-to be created. Attached into subnets with round-robin
+to be created. Attached into subnets with round-robin. Public and private subnets must be created in order to use NAT Gateway.
 
 |M_SUBNETS |list(map)
 |
@@ -38,6 +33,33 @@ to be created. Attached into subnets with round-robin
 ----
 |no |init |Defines public and private subnets
 that are created in specified or any available AZs
+
+|M_VM_GROUPS |list(map)
+|
+[source]
+----
+{
+  name: vm-group0,
+  vm_count: 1,
+  vm_size: "t3.medium",
+  use_public_ip: false,
+  subnet_names: ["first_private_subnet"],
+  sg_names: ["default_sg"],
+  vm_image: {
+    ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2",
+    owner: "309956199498",
+  },
+  data_disks: [
+    {
+      device_name: "/dev/sdf",
+      disk_size_gb: 16,
+      type: "gp2"
+    }
+  ]
+}
+----
+|no |init |Defines vm groups with specified parameters. 
+
 
 |M_SECURITY_GROUPS |map
 |
@@ -86,6 +108,18 @@ module in
 
 |M_ADDRESS_SPACE |string |10.1.0.0/20 |no |init |VPC address space
 
-|M_OS |string |ubuntu |no |init |Operating System to launch.
-Possible values: ubuntu/redhat
+|M_VIRTUAL_PRIVATE_GATEWAY |bool |false |no |init |Virtual private gateway for VPN connection. 
+Can be used only with private subnets
+|===
+
+== Additional informations
+
+Appropriate input parameters must be used in order to create the right type of VPC. 
+It is possible to use any available os image (virtual machine will be recreated after changing the values) but Epiphany team supports and tests configuration on only the following:
+
+[width="100%",cols="25%,50%,25%",options="header",]
+|===
+|OS distribution |AMI |Owner
+|Redhat |RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2 |309956199498
+|Ubuntu |ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200611 |099720109477
 |===

@@ -1,23 +1,19 @@
-output "private_ip" {
-  value = module.ec2.private_ip
-}
-
-output "public_ip" {
-  value = module.ec2.public_ip
-}
-
 output "vpc_id" {
-  value = module.ec2.vpc_id
-}
-
-output "public_subnet_ids" {
-  value = module.ec2.public_subnet_ids
+  value = aws_vpc.awsbi_vpc.id
 }
 
 output "private_subnet_ids" {
-  value = module.ec2.private_subnet_ids
+  value = aws_subnet.awsbi_private_subnet.*.id
 }
 
-output "private_route_table_id" {
-  value = module.ec2.private_route_table
+output "public_subnet_ids" {
+  value = aws_subnet.awsbi_public_subnet.*.id
+}
+
+output "private_route_table" {
+  value = "${ join(" ", aws_route_table.awsbi_route_table_private.*.id) }"
+}
+
+output "vm_group" {
+  value = module.vm_group.*.vm_group
 }
