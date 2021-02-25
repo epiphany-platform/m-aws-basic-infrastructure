@@ -41,5 +41,5 @@ module "vm_group" {
   vpc_id            = aws_vpc.awsbi_vpc.id
   name              = var.name
 
-  depends_on = [aws_subnet.awsbi_public_subnet]
+  depends_on = [aws_subnet.awsbi_public_subnet, aws_subnet.awsbi_private_subnet]
 }

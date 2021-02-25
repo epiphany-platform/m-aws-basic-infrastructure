@@ -15,6 +15,7 @@ $(M_MODULE_SHORT):
   name: $(M_NAME)
   region: $(M_REGION)
   nat_gateway_count: $(M_NAT_GATEWAY_COUNT)
+  virtual_private_gateway: $(M_VIRTUAL_PRIVATE_GATEWAY)
   rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
   vpc_address_space: $(M_ADDRESS_SPACE)  
   subnets: $(M_SUBNETS)

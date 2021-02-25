@@ -13,6 +13,11 @@ variable "nat_gateway_count" {
   type        = number
 }
 
+variable "virtual_private_gateway" {
+  description = "Virtual private gateway for VPN connection"
+  type        = bool
+}
+
 variable "vpc_address_space" {
   description = "The address space of the VPC"
   type        = string
@@ -78,7 +83,7 @@ variable vm_groups {
     })
     data_disks    = list(object({
       device_name = string
-      disk_size_gb = number
+      disk_size_gb= number
       type        = string
     }))
   }))

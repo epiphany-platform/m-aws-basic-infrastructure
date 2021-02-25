@@ -105,6 +105,15 @@ resource "aws_subnet" "awsbi_private_subnet" {
   }
 }
 
+resource "aws_vpn_gateway" "awsbi_vpn_gw" {
+  count  = local.use_virtual_private_gateway ? 1 : 0
+  vpc_id = aws_vpc.awsbi_vpc.id
+
+  tags = {
+    Name = "${var.name}-vpn-gw${count.index}"
+  }
+}
+
 resource "aws_eip" "awsbi_nat_gateway" {
   count = local.use_nat_gateway ? var.nat_gateway_count : 0 
   vpc   = true
@@ -129,12 +138,13 @@ resource "aws_nat_gateway" "awsbi_nat_gateway" {
 }
 
 resource "aws_route_table" "awsbi_route_table_private" {
-  count  = local.use_nat_gateway ? var.nat_gateway_count : 0
+  count  = local.use_nat_gateway ? var.nat_gateway_count : (local.use_virtual_private_gateway ? 1 : 0)
   vpc_id = aws_vpc.awsbi_vpc.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.awsbi_nat_gateway[count.index].id
+    nat_gateway_id = local.use_nat_gateway ? aws_nat_gateway.awsbi_nat_gateway[count.index].id : null
+    gateway_id     = local.use_virtual_private_gateway ? aws_vpn_gateway.awsbi_vpn_gw[count.index].id : null
   }
 
   tags = {
@@ -144,7 +154,7 @@ resource "aws_route_table" "awsbi_route_table_private" {
 }
 
 resource "aws_route_table_association" "awsbi_route_association_private" {
-  count          = local.use_nat_gateway ? length(var.subnets.private) : 0
+  count          = local.use_nat_gateway || local.use_virtual_private_gateway ? length(var.subnets.private) : 0
   subnet_id      = aws_subnet.awsbi_private_subnet[count.index].id
   route_table_id = element(aws_route_table.awsbi_route_table_private.*.id, count.index)
 }

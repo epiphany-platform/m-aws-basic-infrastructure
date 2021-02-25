@@ -144,11 +144,11 @@ or if you want to set a different version number:
 
 The output from this module is:
 
-* private_ip
-* public_ip
+* private_subnet_id
 * public_subnet_id
 * vpc_id
 * private_route_table_id
+* vm_groups
 
 ## Integration tests execution
 

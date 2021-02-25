@@ -6,7 +6,7 @@ define _M_SUBNETS
     availability_zone: any,
     address_prefixes: 10.1.1.0/24
   }],
-  public:
+  public: 
   [{
     name: first_public_subnet,
     availability_zone: any,
@@ -57,12 +57,12 @@ define _M_VM_GROUPS
     subnet_names: ["first_private_subnet"],
     sg_names: ["default_sg"],
     vm_image: {
-      ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2", # In case of Ubuntu: "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200611"
-      owner: "309956199498", # In case of Ubuntu: "099720109477"
+      ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2",
+      owner: "309956199498",
     },
     data_disks: [
       {
-        device_name: "/dev/sdf", #/dev/sd[f-p]
+        device_name: "/dev/sdf",
         disk_size_gb: 16,
         type: "gp2"
       }
@@ -72,6 +72,7 @@ define _M_VM_GROUPS
 endef
 
 M_NAT_GATEWAY_COUNT ?= 1
+M_VIRTUAL_PRIVATE_GATEWAY ?= false
 M_SUBNETS ?= $(_M_SUBNETS)
 M_SECURITY_GROUPS ?= $(_M_SECURITY_GROUPS)
 M_VM_GROUPS ?= $(_M_VM_GROUPS)
