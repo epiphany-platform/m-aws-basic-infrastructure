@@ -115,7 +115,7 @@ Can be used only with private subnets
 == Additional informations
 
 Appropriate input parameters must be used in order to create the right type of VPC. 
-It is possible to use any available os image (virtual machine will be recreated after changing the values) but Epiphany team supports and tests configuratuion on only the following:
+It is possible to use any available os image (virtual machine will be recreated after changing the values) but Epiphany team supports and tests configuration on only the following:
 
 [width="100%",cols="25%,50%,25%",options="header",]
 |===
