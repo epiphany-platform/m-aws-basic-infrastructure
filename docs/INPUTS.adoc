@@ -112,13 +112,15 @@ module in
 Can be used only with private subnets
 |===
 
-Additional informations: 
-- Appropriate input parameters must be used in order to create the right [type of VPC](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_wizard.html)
-- It is possible to use any available os image but Epiphany team supports and tests configuratuion on only the following:
+== Additional informations
+
+Appropriate input parameters must be used in order to create the right type of VPC. 
+It is possible to use any available os image (virtual machine will be recreated after changing the values
+) but Epiphany team supports and tests configuratuion on only the following:
+
 [width="100%",cols="25%,50%,25%",options="header",]
 |===
 |OS distribution |AMI |Owner
 |Redhat |RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2 |309956199498
 |Ubuntu |ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200611 |099720109477
 |===
-:warning: Virtual machine will be recreated after changing the values
