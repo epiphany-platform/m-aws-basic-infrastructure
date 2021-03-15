@@ -49,6 +49,7 @@ that are created in specified or any available AZs
     ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2",
     owner: "309956199498",
   },
+  root_volume_size = 30,
   data_disks: [
     {
       device_name: "/dev/sdf",
