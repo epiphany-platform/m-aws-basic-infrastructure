@@ -39,6 +39,10 @@ resource "aws_instance" "awsbi" {
 
   vpc_security_group_ids      = data.aws_security_group.selected.*.id 
 
+  root_block_device {
+    volume_size = var.vm_group.root_volume_size
+  }
+
   tags = {
     Name = "${var.name}-${var.vm_group.name}-${count.index}"
     resource_group = var.name
