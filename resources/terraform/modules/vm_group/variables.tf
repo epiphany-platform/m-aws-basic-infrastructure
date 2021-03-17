@@ -26,6 +26,7 @@ variable vm_group {
       ami         = string
       owner       = string
     })
+    root_volume_size = number
     data_disks    = list(object({
       device_name = string
       disk_size_gb= number
