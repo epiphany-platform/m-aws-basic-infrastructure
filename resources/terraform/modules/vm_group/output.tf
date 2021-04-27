@@ -6,7 +6,8 @@ output "vm_group" {
     {
       vm_name: vm.tags.Name
       public_ip: vm.public_ip
-      private_ips: vm.private_ip
+      private_ip: vm.private_ip
+      id: vm.id
     }
     ]
     data_disks: [

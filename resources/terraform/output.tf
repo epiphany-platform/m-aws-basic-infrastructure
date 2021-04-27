@@ -11,7 +11,7 @@ output "public_subnet_ids" {
 }
 
 output "private_route_table" {
-  value = "${ join(" ", aws_route_table.awsbi_route_table_private.*.id) }"
+  value = join(" ", aws_route_table.awsbi_route_table_private.*.id)
 }
 
 output "vm_group" {
