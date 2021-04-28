@@ -41,7 +41,7 @@ build: guard-IMAGE_NAME
 #test targets are located in ./test.mk file
 test: guard-IMAGE_REPOSITORY build
 	$(eval LDFLAGS = $(shell govvv -flags -pkg github.com/epiphany-platform/m-azure-basic-infrastructure/cmd -version $(VERSION)))
-	@ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) go test -ldflags="$(LDFLAGS)" -v -timeout 30m
+	@AWS_SECRET_ACCESS_KEY=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWSBI_IMAGE_TAG=epiphanyplatform/awsbi:$(VERSION) go test -ldflags="$(LDFLAGS)" -v -timeout 30m ./...
 
 pipeline-test:
 	$(eval LDFLAGS = $(shell govvv -flags -pkg github.com/epiphany-platform/m-azure-basic-infrastructure/cmd -version $(VERSION)))

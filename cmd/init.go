@@ -16,6 +16,7 @@ import (
 var (
 	name       string
 	vmsRsaPath string
+	region     string
 )
 
 // initCmd represents the init command
@@ -33,6 +34,7 @@ var initCmd = &cobra.Command{
 
 		name = viper.GetString("name")
 		vmsRsaPath = viper.GetString("vms_rsa")
+		region = viper.GetString("region")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("init called")
@@ -75,6 +77,7 @@ var initCmd = &cobra.Command{
 		}
 
 		config.Params.Name = to.StrPtr(name)
+		config.Params.Region = to.StrPtr(region)
 		config.Params.RsaPublicKeyPath = to.StrPtr(filepath.Join(SharedDirectory, fmt.Sprintf("%s.pub", vmsRsaPath)))
 
 		state.AwsBI.Status = st.Initialized
@@ -103,5 +106,6 @@ func init() {
 	rootCmd.AddCommand(initCmd)
 
 	initCmd.Flags().String("name", "epiphany", "prefix given to all resources created") //TODO rename to prefix
+	initCmd.Flags().String("region", "eu-central-1", "region used to initialize config file")
 	initCmd.Flags().String("vms_rsa", "vms_rsa", "name of rsa keypair to be provided to machines")
 }

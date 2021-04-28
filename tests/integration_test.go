@@ -41,7 +41,7 @@ var (
 	awsSecretKey              string
 	k8sHostPath               string
 	k8sVolPath                string
-	stateFilePath             = "shared/state.yml"
+	stateFilePath             = "shared/state.json"
 	sharedAbsoluteFilePath, _ = filepath.Abs("./shared")
 	mountDir                  = sharedAbsoluteFilePath + ":/shared"
 	dockerExecPath, _         = exec.LookPath("docker")
@@ -61,10 +61,10 @@ func TestMain(m *testing.M) {
 
 func TestOnInitWithDefaultsShouldCreateProperFileAndFolder(t *testing.T) {
 	// given
-	expectedFileContentRegexp := "kind: state\nawsbi:\n  status: initialized"
+	expectedFileContentRegexp := "{((.|\\n|\\r)*)\"kind\": \"state\",((.|\\n|\\r)*)\"status\": \"initialized\",((.|\\n|\\r)*)"
 
 	// when
-	_, stderr := runDocker(t, "init", "M_NAME="+moduleName, "M_REGION="+awsRegion)
+	_, stderr := runDocker(t, []string{"NAME=" + moduleName, "REGION=" + awsRegion}, "init")
 
 	if stderr.Len() > 0 {
 		t.Fatal("There was an error during executing a command. ", string(stderr.Bytes()))
@@ -92,10 +92,10 @@ func TestOnInitWithDefaultsShouldCreateProperFileAndFolder(t *testing.T) {
 
 func TestOnPlanWithDefaultsShouldDisplayPlan(t *testing.T) {
 	// given
-	expectedOutputRegexp := ".*Plan: 16 to add, 0 to change, 0 to destroy.*"
+	expectedOutputRegexp := ".*Add: 16, Change: 0, Destroy: 0.*"
 
 	// when
-	stdout, stderr := runDocker(t, "plan", awsAccessKey, awsSecretKey)
+	stdout, stderr := runDocker(t, []string{awsAccessKey, awsSecretKey}, "plan")
 
 	if stderr.Len() > 0 {
 		t.Fatal("There was an error during executing a command. ", string(stderr.Bytes()))
@@ -117,10 +117,10 @@ func TestOnPlanWithDefaultsShouldDisplayPlan(t *testing.T) {
 
 func TestOnApplyShouldCreateEnvironment(t *testing.T) {
 	// given
-	expectedOutputRegexp := ".*Apply complete! Resources: 16 added, 0 changed, 0 destroyed.*"
+	expectedOutputRegexp := ".*Performed following changes:((.|\\n|\\r)*)Add: 16, Change: 0, Destroy: 0.*"
 
 	// when
-	stdout, stderr := runDocker(t, "apply", awsAccessKey, awsSecretKey)
+	stdout, stderr := runDocker(t, []string{awsAccessKey, awsSecretKey}, "apply")
 
 	if stderr.Len() > 0 {
 		t.Fatal("There was an error during executing a command. ", string(stderr.Bytes()))
@@ -181,10 +181,10 @@ func checkNumberOfVms(t *testing.T) {
 
 func TestOnDestroyPlanShouldDisplayDestroyPlan(t *testing.T) {
 	// given
-	expectedOutputRegexp := "Plan: 0 to add, 0 to change, 16 to destroy"
+	expectedOutputRegexp := "Will perform following changes:((.|\\n|\\r)*)Add: 0, Change: 0, Destroy: 16"
 
 	// when
-	stdout, stderr := runDocker(t, "plan-destroy", awsAccessKey, awsSecretKey)
+	stdout, stderr := runDocker(t, []string{awsAccessKey, awsSecretKey}, "plan", "--destroy")
 
 	if stderr.Len() > 0 {
 		t.Fatal("There was an error during executing a command. ", string(stderr.Bytes()))
@@ -205,10 +205,10 @@ func TestOnDestroyPlanShouldDisplayDestroyPlan(t *testing.T) {
 
 func TestOnDestroyShouldDestroyEnvironment(t *testing.T) {
 	// given
-	expectedOutputRegexp := "Apply complete! Resources: 0 added, 0 changed, 16 destroyed."
+	expectedOutputRegexp := "Performed following changes:((.|\\n|\\r)*)Add: 0, Change: 0, Destroy: 16"
 
 	// when
-	stdout, stderr := runDocker(t, "destroy", awsAccessKey, awsSecretKey)
+	stdout, stderr := runDocker(t, []string{awsAccessKey, awsSecretKey}, "destroy")
 
 	if stderr.Len() > 0 {
 		t.Fatal("There was an error during executing a command. ", string(stderr.Bytes()))
@@ -234,13 +234,13 @@ func setup() {
 	if len(awsAccessKey) == 0 {
 		log.Fatalf("expected non-empty AWS_ACCESS_KEY_ID environment variable")
 	}
-	awsAccessKey = "M_AWS_ACCESS_KEY=" + awsAccessKey
+	awsAccessKey = "ACCESS_KEY_ID=" + awsAccessKey
 
 	awsSecretKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 	if len(awsSecretKey) == 0 {
 		log.Fatalf("expected non-empty AWS_SECRET_ACCESS_KEY environment variable")
 	}
-	awsSecretKey = "M_AWS_SECRET_KEY=" + awsSecretKey
+	awsSecretKey = "SECRET_ACCESS_KEY=" + awsSecretKey
 
 	imageTag = os.Getenv("AWSBI_IMAGE_TAG")
 	if len(imageTag) == 0 {
@@ -317,12 +317,13 @@ func cleanupAWSResources() {
 	for _, resourcesTypeToRemove := range resourcesTypesToRemove {
 
 		filtered := make([]*resourcegroups.ResourceIdentifier, 0)
-		for _, element := range rgResourcesList.ResourceIdentifiers {
-			s := strings.Split(*element.ResourceType, ":")
-			if s[4] == resourcesTypeToRemove {
-				filtered = append(filtered, element)
+		if rgResourcesList != nil {
+			for _, element := range rgResourcesList.ResourceIdentifiers {
+				s := strings.Split(*element.ResourceType, ":")
+				if s[4] == resourcesTypeToRemove {
+					filtered = append(filtered, element)
+				}
 			}
-
 		}
 
 		switch resourcesTypeToRemove {
@@ -360,10 +361,14 @@ func cleanupAWSResources() {
 }
 
 // run docker with image tag and mounts storage from mountDir with imageTag and other parameters
-func runDocker(t *testing.T, params ...string) (bytes.Buffer, bytes.Buffer) {
+func runDocker(t *testing.T, envs []string, params ...string) (bytes.Buffer, bytes.Buffer) {
 	var stdout, stderr bytes.Buffer
 
-	commandWithParams := []string{dockerExecPath, "run", "--rm", "-v", mountDir, "-t", imageTag}
+	commandWithParams := []string{dockerExecPath, "run", "--rm", "-v", mountDir}
+	for _, e := range envs {
+		commandWithParams = append(commandWithParams, "-e", e)
+	}
+	commandWithParams = append(commandWithParams, "-t", imageTag)
 
 	commandWithParams = append(commandWithParams, params...)
 
@@ -376,6 +381,7 @@ func runDocker(t *testing.T, params ...string) (bytes.Buffer, bytes.Buffer) {
 
 	if err := command.Run(); err != nil {
 		t.Log("Stderr: ", string(stderr.Bytes()))
+		t.Log("Stderr: ", string(stdout.Bytes()))
 		t.Fatal("There was an error running command:", err)
 	}
 	t.Log("Stdout: ", string(stdout.Bytes()))
