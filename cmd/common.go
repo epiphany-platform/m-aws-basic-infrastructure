@@ -3,13 +3,14 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+
 	awsbi "github.com/epiphany-platform/e-structures/awsbi/v0"
 	st "github.com/epiphany-platform/e-structures/state/v0"
 	"github.com/google/go-cmp/cmp"
 	"github.com/jinzhu/copier"
 	terra "github.com/mkyc/go-terraform"
-	"io/ioutil"
-	"path/filepath"
 )
 
 type ZeroLogger struct{}

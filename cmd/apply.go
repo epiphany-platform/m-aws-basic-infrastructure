@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
+
 	st "github.com/epiphany-platform/e-structures/state/v0"
 	"github.com/epiphany-platform/e-structures/utils/save"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"path/filepath"
 )
 
 // applyCmd represents the apply command

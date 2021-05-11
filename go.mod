@@ -2,11 +2,9 @@ module github.com/epiphany-platform/m-aws-basic-infrastructure
 
 go 1.15
 
-replace github.com/epiphany-platform/e-structures => ../../epiphany-platform/e-structures
-
 require (
 	github.com/aws/aws-sdk-go v1.27.1
-	github.com/epiphany-platform/e-structures v0.0.7
+	github.com/epiphany-platform/e-structures v0.0.8
 	github.com/google/go-cmp v0.5.3
 	github.com/jinzhu/copier v0.3.0
 	github.com/mkyc/go-terraform v0.0.7

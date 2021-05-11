@@ -25,9 +25,6 @@ all: build
 .PHONY: build test pipeline-test release prepare-service-principal
 
 build: guard-IMAGE_NAME
-	rm -rf ./tmp
-	mkdir -p ./tmp
-	cp -R ../../epiphany-platform/e-structures/ ./tmp
 	docker build \
 		--progress plain \
 		--build-arg ARG_M_VERSION=$(VERSION) \
@@ -35,7 +32,6 @@ build: guard-IMAGE_NAME
 		--build-arg ARG_HOST_GID=$(HOST_GID) \
 		-t $(IMAGE_NAME) \
 		.
-	rm -rf ./tmp
 
 #prepare service principal variables file before running this target using `CLIENT_ID=xxx CLIENT_SECRET=yyy SUBSCRIPTION_ID=zzz TENANT_ID=vvv make prepare-service-principal`
 #test targets are located in ./test.mk file
