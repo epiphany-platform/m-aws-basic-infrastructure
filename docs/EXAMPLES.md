@@ -1,9 +1,15 @@
 # Examples
 
+## Prepare docker image
+
+```shell
+make build VERSION=latest
+```
+
 ## Prepare credentials
 
-Prepare your own variables in `azure.mk` file to use in the process.
-Sample file (`examples/basic_flow/azure.mk.sample`):
+Prepare your own variables in `vars.mk` file to use in the process.
+Sample file (`examples/basic_flow/vars.mk.sample`):
 
 ```shell
 AWS_ACCESS_KEY ?= aws_access_key_id
