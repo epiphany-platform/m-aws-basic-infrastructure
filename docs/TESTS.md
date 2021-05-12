@@ -1,11 +1,11 @@
 # Tests
 
-## Prepare service principal
+## Prepare AWS credentials
 
-Prepare service principal variables file before running this tests:
+Prepare AWS credentials variables file before running this tests:
 
 ```shell
-ACCESS_KEY_ID=xxx SECRET_ACCESS_KEY=yyy make prepare-service-principal
+ACCESS_KEY_ID=xxx SECRET_ACCESS_KEY=yyy make prepare-aws-credentials
 ```
 (note no `AWS_` part in env variables names)
 

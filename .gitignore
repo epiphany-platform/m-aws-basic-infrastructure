@@ -6,4 +6,4 @@
 *.swp
 *.swo
 *.log
-/service-principal.mk
+/aws-credentials.mk

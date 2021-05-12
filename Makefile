@@ -5,12 +5,12 @@ IMAGE_REPOSITORY := epiphanyplatform/awsbi
 
 IMAGE_NAME := $(IMAGE_REPOSITORY):$(VERSION)
 
-define SERVICE_PRINCIPAL_CONTENT
+define AWS_CREDENTIALS_CONTENT
 AWS_ACCESS_KEY_ID ?= $(ACCESS_KEY_ID)
 AWS_SECRET_ACCESS_KEY ?= $(SECRET_ACCESS_KEY)
 endef
 
--include ./service-principal.mk
+-include ./aws-credentials.mk
 
 export
 
@@ -22,7 +22,7 @@ HOST_GID := $(shell id -g)
 
 all: build
 
-.PHONY: build test pipeline-test release prepare-service-principal
+.PHONY: build test pipeline-test release prepare-aws-credentials
 
 build: guard-IMAGE_NAME
 	docker build \
@@ -33,8 +33,7 @@ build: guard-IMAGE_NAME
 		-t $(IMAGE_NAME) \
 		.
 
-#prepare service principal variables file before running this target using `CLIENT_ID=xxx CLIENT_SECRET=yyy SUBSCRIPTION_ID=zzz TENANT_ID=vvv make prepare-service-principal`
-#test targets are located in ./test.mk file
+#prepare AWS credentials variables file before running this target using `AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=yyy make prepare-aws-credentials`
 test: guard-IMAGE_REPOSITORY build
 	$(eval LDFLAGS = $(shell govvv -flags -pkg github.com/epiphany-platform/m-azure-basic-infrastructure/cmd -version $(VERSION)))
 	@AWS_SECRET_ACCESS_KEY=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWSBI_IMAGE_TAG=epiphanyplatform/awsbi:$(VERSION) go test -ldflags="$(LDFLAGS)" -v -timeout 30m ./...
@@ -43,8 +42,8 @@ pipeline-test:
 	$(eval LDFLAGS = $(shell govvv -flags -pkg github.com/epiphany-platform/m-azure-basic-infrastructure/cmd -version $(VERSION)))
 	@go test -ldflags="$(LDFLAGS)" -v -timeout 30m
 
-prepare-service-principal: guard-ACCESS_KEY_ID guard-SECRET_ACCESS_KEY
-	@echo "$$SERVICE_PRINCIPAL_CONTENT" > $(ROOT_DIR)/service-principal.mk
+prepare-aws-credentials: guard-ACCESS_KEY_ID guard-SECRET_ACCESS_KEY
+	@echo "$$AWS_CREDENTIALS_CONTENT" > $(ROOT_DIR)/aws-credentials.mk
 
 release: guard-VERSION guard-IMAGE_NAME
 	docker build \
