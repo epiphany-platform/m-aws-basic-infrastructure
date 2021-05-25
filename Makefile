@@ -36,7 +36,7 @@ build: guard-IMAGE_NAME
 #prepare AWS credentials variables file before running this target using `AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=yyy make prepare-aws-credentials`
 test: guard-IMAGE_REPOSITORY build
 	$(eval LDFLAGS = $(shell govvv -flags -pkg github.com/epiphany-platform/m-azure-basic-infrastructure/cmd -version $(VERSION)))
-	@AWS_SECRET_ACCESS_KEY=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWSBI_IMAGE_TAG=epiphanyplatform/awsbi:$(VERSION) go test -ldflags="$(LDFLAGS)" -v -timeout 30m ./...
+	@AWS_SECRET_ACCESS_KEY=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWSBI_IMAGE_TAG=$(IMAGE_REPOSITORY):$(VERSION) go test -ldflags="$(LDFLAGS)" -v -timeout 30m ./...
 
 pipeline-test:
 	$(eval LDFLAGS = $(shell govvv -flags -pkg github.com/epiphany-platform/m-azure-basic-infrastructure/cmd -version $(VERSION)))
