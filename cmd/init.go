@@ -34,7 +34,7 @@ var initCmd = &cobra.Command{
 		}
 
 		name = viper.GetString("name")
-		vmsRsaPath = viper.GetString("vms_rsa")
+		vmsRsaPath = viper.GetString("vms-rsa")
 		region = viper.GetString("region")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -108,5 +108,5 @@ func init() {
 
 	initCmd.Flags().String("name", "epiphany", "prefix given to all resources created") //TODO rename to prefix
 	initCmd.Flags().String("region", "eu-central-1", "region used to initialize config file")
-	initCmd.Flags().String("vms_rsa", "vms_rsa", "name of rsa keypair to be provided to machines")
+	initCmd.Flags().String("vms-rsa", "vms_rsa", "name of rsa keypair to be provided to machines")
 }

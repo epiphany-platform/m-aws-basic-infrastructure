@@ -27,7 +27,7 @@ Following table presents parameters which should be passed as command parameters
 
 |region |string |eu-central-1 |no |init |Region to be used on resources
 
-|vms_rsa |string |vms_rsa |no |init |SSH key name, should be located in shared directory
+|vms-rsa |string |vms_rsa |no |init |SSH key name, should be located in shared directory
 
 |debug |bool |false |no |all |prints additional debug information
 

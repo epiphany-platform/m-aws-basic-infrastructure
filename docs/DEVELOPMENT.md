@@ -117,8 +117,8 @@ There is a simple way to develop terraform scripts independently of module.
 
 1) have image built already
 1) go to `resources` directory in terminal
-1) run module init command ie.: `docker run --rm -v $(pwd)/shared:/shared -t epiphanyplatform/awsbi:dev init`
-1) run module plan command with debug switch ie.: `docker run --rm -v $(pwd)/shared:/shared -e AWS_ACCESS_KEY_ID=xxx -e AWS_SECRET_ACCESS_KEY=yyy epiphanyplatform/awsbi:dev plan --debug`
+1) run module init command i.e. `docker run --rm -v $(pwd)/shared:/shared -t epiphanyplatform/awsbi:dev init`
+1) run module plan command with debug switch i.e. `docker run --rm -v $(pwd)/shared:/shared -e AWS_ACCESS_KEY_ID=xxx -e AWS_SECRET_ACCESS_KEY=yyy epiphanyplatform/awsbi:dev plan --debug`
 1) that would provide you detailed output and one of first lines provides used .tfvars.json file. It will look similar to following: 
    ```
    ...

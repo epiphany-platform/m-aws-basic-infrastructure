@@ -13,13 +13,11 @@ import (
 // applyCmd represents the apply command
 var applyCmd = &cobra.Command{
 	Use:   "apply",
-	Short: "applies planned changes on Azure cloud",
-	Long: `Applies planned changes on Azure cloud. 
+	Short: "applies planned changes on AWS cloud",
+	Long: `Applies planned changes on AWS cloud. 
 
-Using plan file created with 'plan' command this command performs actual 'terraform apply' operation. This command
-performs following steps: 
+Using file created with 'plan' step this command performs actual 'terraform apply' operation. It performs following steps: 
  - validates presence of config and module state files
- - checks that module status is either 'Initialized' or 'Destroyed'
  - performs 'terraform apply' operation using existing plan file
  - updates module state file with applied config
  - saves terraform output to module state file. 

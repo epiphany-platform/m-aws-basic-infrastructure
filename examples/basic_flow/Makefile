@@ -29,7 +29,7 @@ init: setup
 		-t $(AWSBI) \
 		init \
 		--name=$(M_NAME) \
-		--vms_rsa=$(VMS_RSA_FILENAME)
+		--vms-rsa=$(VMS_RSA_FILENAME)
 
 plan: setup
 	@docker run --rm \
