@@ -3,7 +3,7 @@ data "aws_subnet" "selected" {
   vpc_id               = var.vpc_id
   filter {
     name   = "tag:Name"
-    values = ["${var.vm_group.subnet_names[count.index]}"]
+    values = [var.vm_group.subnet_names[count.index]]
   }
 }
 
@@ -17,7 +17,7 @@ data "aws_ami" "select" {
   owners = [var.vm_group.vm_image.owner]
   filter {
     name   = "name"
-    values = ["${var.vm_group.vm_image.ami}"]
+    values = [var.vm_group.vm_image.ami]
   }
   filter {
     name   = "root-device-type"

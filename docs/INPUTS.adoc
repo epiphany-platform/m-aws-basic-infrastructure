@@ -1,119 +1,139 @@
-== Input parameters
+= Input parameters
+
+== Environment variables
+
+Following table presents parameters which should be passes as docker environment variables (`docker run -e KEY=val ...`).
 
 [width="100%",cols="7%,1%,25%a,1%,20%,50%a",options="header",]
 |===
 |Name |Type |Default value |Required |Steps |Description
-|AWS_ACCESS_KEY_ID |string |unset |yes |plan, apply, plan-destroy, destroy
-|AWS access key id
+|ACCESS_KEY_ID |string |unset |yes |plan, apply, destroy |AWS access key ID
 
-|AWS_SECRET_ACCESS_KEY |string |unset |yes |plan, apply, plan-destroy, destroy
-|AWS access key secret
+|SECRET_ACCESS_KEY |string |unset |yes |plan, apply, destroy |AWS secret access key
 
-|M_NAT_GATEWAY_COUNT |number |1 |no |init |The number of NAT gateways
-to be created. Attached into subnets with round-robin. Public and private subnets must be created in order to use NAT Gateway.
-
-|M_SUBNETS |list(map)
-|
-[source]
-----
-{
-  private:
-  [{
-    name: first_private_subnet,
-    availability_zone: any,
-    address_prefixes: 10.1.1.0/24
-  }],
-  public:
-  [{
-    name: first_public_subnet,
-    availability_zone: any,
-    address_prefixes: 10.1.2.0/24
-  }]
-}
-----
-|no |init |Defines public and private subnets
-that are created in specified or any available AZs
-
-|M_VM_GROUPS |list(map)
-|
-[source]
-----
-{
-  name: vm-group0,
-  vm_count: 1,
-  vm_size: "t3.medium",
-  use_public_ip: false,
-  subnet_names: ["first_private_subnet"],
-  sg_names: ["default_sg"],
-  vm_image: {
-    ami: "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2",
-    owner: "309956199498",
-  },
-  root_volume_size = 30,
-  data_disks: [
-    {
-      device_name: "/dev/sdf",
-      disk_size_gb: 16,
-      type: "gp2"
-    }
-  ]
-}
-----
-|no |init |Defines vm groups with specified parameters. 
-
-
-|M_SECURITY_GROUPS |map
-|
-[source]
-----
-[
-  {
-    name: default_sg,
-    rules: {
-      ingress: [
-        {
-          protocol: "-1",
-          from_port: 0,
-          to_port: 0,
-          cidr_blocks: ["10.1.0.0/20"]
-        },
-        {
-          protocol: "tcp",
-          from_port: 22,
-          to_port: 22,
-          cidr_blocks: ["0.0.0.0/0"]
-        }
-      ],
-      egress: [
-      	{
-          protocol: "-1",
-          from_port: 0,
-          to_port: 0,
-          cidr_blocks: ["0.0.0.0/0"]
-        }
-      ]
-    }
-  }
-]
-----
-|no |init |Defines the list of security groups to attach virtual machines to
-
-|M_NAME |string |epiphany |no |init |Name to be used on all resources
-as a prefix
-
-|M_VMS_RSA |string |vms_rsa |no |init |SSH key name, should be located in
-shared directory
-
-|M_REGION |string |eu-central-1 |no |init |AWS Region to launch
-module in
-
-|M_ADDRESS_SPACE |string |10.1.0.0/20 |no |init |VPC address space
-
-|M_VIRTUAL_PRIVATE_GATEWAY |bool |false |no |init |Virtual private gateway for VPN connection. 
-Can be used only with private subnets
 |===
 
-== Additional informations
+Environment variables values can also be passed as command variables (`--key=value`), but it's often more convenient to pass sensitive values as presented.
+
+== Command variables
+
+Following table presents parameters which should be passed as command parameters (`docker run ... --key=value`).
+
+[width="100%",cols="7%,1%,25%a,1%,20%,50%a",options="header",]
+|===
+|Name |Type |Default value |Required |Steps |Description
+
+|name |string |epiphany |no |init |Name to be used on all resources as a prefix
+
+|region |string |eu-central-1 |no |init |Region to be used on resources
+
+|vms-rsa |string |vms_rsa |no |init |SSH key name, should be located in shared directory
+
+|debug |bool |false |no |all |prints additional debug information
+
+|===
+
+Variable values can be passed as docker environment variables as well. We could use `docker run` command `-e NAME=epi` parameter instead of `--name=epi` command parameter.
+
+== Configuration file
+
+`init` command provides some parameters to configure the module from command line, but primary way to configure the module is its configuration file located in `shared/awsbi/awsbi-config.json`.
+
+Only fields that should not be modified are "kind" and "version" fields. All other fields can be modified before running `plan` command. Following listing provides example of configuration file.
+
+----
+{
+	"kind": "awsbi",
+	"version": "v0.0.1",
+	"params": {
+		"name": "epiphany",
+		"region": "eu-central-1",
+		"nat_gateway_count": 1,
+		"virtual_private_gateway": false,
+		"rsa_pub_path": "/shared/vms_rsa.pub",
+		"vpc_address_space": "10.1.0.0/20",
+		"subnets": {
+			"private": [
+				{
+					"name": "first_private_subnet",
+					"availability_zone": "any",
+					"address_prefixes": "10.1.1.0/24"
+				}
+			],
+			"public": [
+				{
+					"name": "first_public_subnet",
+					"availability_zone": "any",
+					"address_prefixes": "10.1.2.0/24"
+				}
+			]
+		},
+		"security_groups": [
+			{
+				"name": "default_sg",
+				"rules": {
+					"ingress": [
+						{
+							"protocol": "-1",
+							"from_port": 0,
+							"to_port": 0,
+							"cidr_blocks": [
+								"10.1.0.0/20"
+							]
+						},
+						{
+							"protocol": "tcp",
+							"from_port": 22,
+							"to_port": 22,
+							"cidr_blocks": [
+								"0.0.0.0/0"
+							]
+						}
+					],
+					"egress": [
+						{
+							"protocol": "-1",
+							"from_port": 0,
+							"to_port": 0,
+							"cidr_blocks": [
+								"0.0.0.0/0"
+							]
+						}
+					]
+				}
+			}
+		],
+		"vm_groups": [
+			{
+				"name": "vm-group0",
+				"vm_count": 1,
+				"vm_size": "t3.medium",
+				"use_public_ip": false,
+				"subnet_names": [
+					"first_private_subnet"
+				],
+				"sg_names": [
+					"default_sg"
+				],
+				"vm_image": {
+					"ami": "RHEL-7.8_HVM_GA-20200225-x86_64-1-Hourly2-GP2",
+					"owner": "309956199498"
+				},
+				"root_volume_size": 30,
+				"data_disks": [
+					{
+						"device_name": "/dev/sdf",
+						"disk_size_gb": 16,
+						"type": "gp2"
+					}
+				]
+			}
+		]
+	}
+}
+----
+
+== Additional information
 
 Appropriate input parameters must be used in order to create the right type of VPC. 
 It is possible to use any available os image (virtual machine will be recreated after changing the values) but Epiphany team supports and tests configuration on only the following:
