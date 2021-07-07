@@ -43,7 +43,7 @@ jobs:
           script: |
             go env
             make build
-            make pipeline-test | tee tests.output
+            make pipeline-test 2>&1 | tee tests.output
             go-junit-report < tests.output > report.xml
           failOnStderr: true
         env:
