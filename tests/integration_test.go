@@ -253,7 +253,7 @@ func setup() {
 	if len(k8sHostPath) != 0 && len(k8sVolPath) != 0 {
 		sharedAbsoluteFilePath = k8sVolPath
 		mountDir = k8sHostPath + ":/shared"
-		stateFilePath = k8sVolPath + "/state.yml"
+		stateFilePath = k8sVolPath + "/state.json"
 	}
 
 	err := os.MkdirAll(sharedAbsoluteFilePath, os.ModePerm)
