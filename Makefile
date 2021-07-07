@@ -40,7 +40,7 @@ test: guard-IMAGE_REPOSITORY build
 
 pipeline-test:
 	$(eval LDFLAGS = $(shell govvv -flags -pkg github.com/epiphany-platform/m-aws-basic-infrastructure/cmd -version $(VERSION)))
-	@go test -ldflags="$(LDFLAGS)" -v -timeout 30m ./...
+	@AWSBI_IMAGE_TAG=$(IMAGE_REPOSITORY):$(VERSION) go test -ldflags="$(LDFLAGS)" -v -timeout 30m ./...
 
 prepare-aws-credentials: guard-ACCESS_KEY_ID guard-SECRET_ACCESS_KEY
 	@echo "$$AWS_CREDENTIALS_CONTENT" > $(ROOT_DIR)/aws-credentials.mk
